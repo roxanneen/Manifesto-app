@@ -38,6 +38,15 @@ const unsigned char kManifesto[] = {
 #include "manifesto_text.inc"
 };
 
+// The manifesto as inscribed on Bitcoin (inscription 70,614,708, block
+// 841,886, 3 May 2024): a JPEG of the typeset text. Every signature names
+// this ID and the sha256 of that file. Anyone can fetch the file from an
+// ordinals explorer, e.g. https://ordinals.com/content/<ID>, and hash it.
+const char kInscriptionId[] = "1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0";
+// The title every current statement names (the first line of the text).
+const char kManifestoTitle[] = "Logos: A Declaration of Independence in Cyberspace";
+const char kInscriptionSha256[] = "441e1c2ae342848fb6298e62cc427d22c2a954b73b6e1f2899da25072757aead";
+
 const QString kReceiptType = QStringLiteral("logos-manifesto-signature");
 constexpr int kReceiptVersion = 1;
 constexpr int kMaxReceiptBytes = 16 * 1024;
@@ -59,25 +68,45 @@ void ManifestoUiBackend::setSign(const QString& state, const QString& info)
 // ---------------------------------------------------------------------------
 // Statement and receipt (pure)
 
-QString ManifestoUiBackend::buildStatement(const QString& title, const QString& hashHex, const QString& isoDate)
+QString ManifestoUiBackend::buildStatement(const QString& title, const QString& inscriptionId,
+                                           const QString& hashHex, const QString& isoDate)
 {
     // One line of plain printable text: it reads the same wherever it is
     // shown, and it survives being pasted into a chat better than several.
-    return QStringLiteral("I sign the Logos manifesto, \"%1\". Text sha256: %2. Signed on %3.")
-        .arg(title, hashHex, isoDate);
+    // It names the copy of the manifesto inscribed on Bitcoin, by its
+    // inscription ID and the sha256 of that file, so every signature points
+    // at a version nobody can change.
+    return QStringLiteral("I sign the Logos manifesto, \"%1\", inscribed on Bitcoin as %2. Image sha256: %3. Signed on %4.")
+        .arg(title, inscriptionId, hashHex, isoDate);
 }
 
-bool ManifestoUiBackend::parseStatement(const QString& statement, QString& title, QString& hashHex, QString& isoDate)
+bool ManifestoUiBackend::parseStatement(const QString& statement, QString& title, QString& inscriptionId,
+                                        QString& hashHex, QString& isoDate)
 {
-    static const QRegularExpression re(QStringLiteral(
+    // The current form, naming the Bitcoin inscription.
+    static const QRegularExpression current(QStringLiteral(
+        "\\AI sign the Logos manifesto, \"([^\"]{1,200})\", inscribed on Bitcoin as ([0-9a-f]{64}i[0-9]{1,6})\\. "
+        "Image sha256: ([0-9a-f]{64})\\. Signed on (\\d{4}-\\d{2}-\\d{2})\\.\\z"));
+    // The form versions up to 0.1.5 signed: the sha256 of the app's text.
+    // Still read, so those receipts check out, as a different version.
+    static const QRegularExpression earlier(QStringLiteral(
         "\\AI sign the Logos manifesto, \"([^\"]{1,200})\"\\. Text sha256: ([0-9a-f]{64})\\. "
         "Signed on (\\d{4}-\\d{2}-\\d{2})\\.\\z"));
-    const QRegularExpressionMatch m = re.match(statement);
-    if (!m.hasMatch())
-        return false;
-    title = m.captured(1);
-    hashHex = m.captured(2);
-    isoDate = m.captured(3);
+    QRegularExpressionMatch m = current.match(statement);
+    if (m.hasMatch()) {
+        title = m.captured(1);
+        inscriptionId = m.captured(2);
+        hashHex = m.captured(3);
+        isoDate = m.captured(4);
+    } else {
+        m = earlier.match(statement);
+        if (!m.hasMatch())
+            return false;
+        title = m.captured(1);
+        inscriptionId.clear();
+        hashHex = m.captured(2);
+        isoDate = m.captured(3);
+    }
     return QDate::fromString(isoDate, Qt::ISODate).isValid();
 }
 
@@ -107,11 +136,12 @@ QJsonObject ManifestoUiBackend::checkReceipt(const QJsonObject& receipt, const Q
         return fail(QStringLiteral("The address in the receipt is not an Ethereum address."));
     out.insert(QStringLiteral("address"), std2q(claimed));
 
-    QString title, hash, date;
-    if (!parseStatement(statement, title, hash, date))
+    QString title, inscription, hash, date;
+    if (!parseStatement(statement, title, inscription, hash, date))
         return fail(QStringLiteral("The signed text is not a manifesto statement, so it says nothing about the manifesto."));
     out.insert(QStringLiteral("title"), title);
     out.insert(QStringLiteral("hash"), hash);
+    out.insert(QStringLiteral("inscription"), inscription);
     out.insert(QStringLiteral("date"), date);
 
     sig::Address signer;
@@ -124,7 +154,11 @@ QJsonObject ManifestoUiBackend::checkReceipt(const QJsonObject& receipt, const Q
     }
 
     out.insert(QStringLiteral("valid"), true);
-    out.insert(QStringLiteral("sameText"), hash == currentHash);
+    // The version this app signs: the Bitcoin inscription, by its file's
+    // hash and its ID. A receipt in the earlier form names the app's text
+    // instead and is valid, but for a different version.
+    out.insert(QStringLiteral("sameText"), hash == currentHash && inscription == QLatin1String(kInscriptionId)
+                                           && title == QLatin1String(kManifestoTitle));
     return out;
 }
 
@@ -170,7 +204,10 @@ void ManifestoUiBackend::loadManifesto()
     const int nl = text.indexOf(QLatin1Char('\n'));
     setManifestoTitle(nl > 0 ? text.left(nl).trimmed() : QStringLiteral("Logos manifesto"));
     setManifestoText(text);
-    setManifestoHash(QString::fromLatin1(QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex()));
+    setTextSha256(QString::fromLatin1(QCryptographicHash::hash(bytes, QCryptographicHash::Sha256).toHex()));
+    // What every signature names: the manifesto as inscribed on Bitcoin.
+    setInscriptionId(QLatin1String(kInscriptionId));
+    setManifestoHash(QLatin1String(kInscriptionSha256));
     setStatement(todayStatement());
 }
 
@@ -180,7 +217,7 @@ QString ManifestoUiBackend::todayStatement() const
     QString date = QProcessEnvironment::systemEnvironment().value(QStringLiteral("MANIFESTO_DATE"));
     if (!QDate::fromString(date, Qt::ISODate).isValid())
         date = QDateTime::currentDateTimeUtc().date().toString(Qt::ISODate);
-    return buildStatement(manifestoTitle(), manifestoHash(), date);
+    return buildStatement(manifestoTitle(), inscriptionId(), manifestoHash(), date);
 }
 
 // ---------------------------------------------------------------------------
@@ -476,7 +513,8 @@ QJsonObject ManifestoUiBackend::receiptFromLooseText(const QString& textIn)
     t = t.simplified();
 
     static const QRegularExpression stRe(QStringLiteral(
-        "I sign the Logos manifesto, \"[^\"]{1,200}\"\\. Text sha256: [0-9a-f]{64}\\. Signed on \\d{4}-\\d{2}-\\d{2}\\."));
+        "I sign the Logos manifesto, \"[^\"]{1,200}\"(?:, inscribed on Bitcoin as [0-9a-f]{64}i[0-9]{1,6}\\. Image sha256: |\\. Text sha256: )"
+        "[0-9a-f]{64}\\. Signed on \\d{4}-\\d{2}-\\d{2}\\."));
     // A signature may have been split by a space or a line break.
     static const QRegularExpression sigRe(QStringLiteral(
         "(?<![0-9a-fA-F])0[xX](?:[0-9a-fA-F] ?){130}(?![0-9a-fA-F])"));

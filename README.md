@@ -21,7 +21,7 @@ The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad 
 
 ## Status
 
-Version 0.1.5, 26 November 2026. This version signs and verifies on one computer and exports the
+Version 0.1.6, 26 November 2026. This version signs and verifies on one computer and exports the
 receipt. There is no shared list of signers yet.
 
 | Platform | State |
@@ -74,26 +74,43 @@ never points at a release without the signed file.
 
 ## What is signed
 
-The app does not sign the whole text. It signs one line that names the text by its hash:
+The app does not sign the whole text. It signs one line that names the manifesto as it is inscribed
+on Bitcoin:
 
 ```
-I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace". Text sha256: <64 hex>. Signed on <YYYY-MM-DD>.
+I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace", inscribed on Bitcoin as 1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0. Image sha256: 441e1c2ae342848fb6298e62cc427d22c2a954b73b6e1f2899da25072757aead. Signed on <YYYY-MM-DD>.
 ```
 
-- The hash is the sha256 of `src/manifesto.txt`, byte for byte. That file is baked into the build,
-  so the file is the version being signed. Changing one character changes the hash.
-- The date is the signer's own statement (UTC). Nothing timestamps it independently.
-- The line is plain printable text on one line. The app shows it above the Sign button.
+- **The inscription.** Ordinals inscription 70,614,708, ID `1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0`, made in Bitcoin block 841,886 on
+  3 May 2024. Its content is a JPEG of the typeset manifesto, 1,781 × 10,807 pixels, 3,969,424 bytes.
+- **The hash** is the sha256 of that file, byte for byte. Every signature therefore points at a copy
+  nobody can change. Anyone can check it: download the file from an ordinals explorer and hash it.
+
+  ```bash
+  curl -sL https://ordiscan.com/content/1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0 | shasum -a 256
+  ```
+
+  The same file is served by `static.unisat.io/content/<ID>` and, in a browser, by
+  `ordinals.com/content/<ID>`. All three gave `441e1c2ae342848f…` on 26 November 2026.
+- **The date** is the signer's own statement (UTC). Nothing timestamps it independently.
+- **One line** of plain printable text. The app shows it above the Sign button.
+
+Versions 0.1.0 to 0.1.5 signed a different line, naming the sha256 of the app's own text
+(`… Text sha256: <64 hex>. Signed on <date>.`). Those receipts still verify, and the app reports them
+as signatures of an earlier version.
+
+## The text shown in the app
 
 `src/manifesto.txt` is the manifesto by Jarrad Hope, taken from its source,
-<https://logos.co/manifesto>, on 26 November 2026 and checked
-against the rendered page word for word: the title, the author, the abstract, the keywords and all
-29 body paragraphs are identical and in the same order (1,260 words). The contact line under the
-author's name (email, site, PGP) is left out. The page has no official plain-text form, so the line
-breaks are this app's choice: the title and the author's name on the first two lines, then one
-paragraph per line with a blank line between (the abstract starts with `Abstract. `), and `Keywords`
-on a line of its own directly above the list. If Logos publishes a canonical text file, replace this one; the hash
-and every new signature follow it.
+<https://logos.co/manifesto>, on 26 November 2026 and checked against the rendered page word for
+word: the title, the author, the abstract, the keywords and all 29 body paragraphs are identical and
+in the same order. The closing line **"Hack the planet!"**, which the website leaves out, is taken
+from the inscribed copy, where it is the last line. The contact line under the author's name
+(email, site, PGP) is left out. The line breaks are this app's choice, and the view lays the text out
+for reading; neither changes what is signed.
+
+The signature names the inscription, not this file. The app displays the text so people can read
+what they sign; the inscription is the reference.
 
 ## How a signature is made
 
@@ -116,7 +133,7 @@ nothing but this.
   "type": "logos-manifesto-signature",
   "version": 1,
   "scheme": "eip191",
-  "statement": "I sign the Logos manifesto, \"…\". Text sha256: …. Signed on 2026-11-26.",
+  "statement": "I sign the Logos manifesto, \"…\", inscribed on Bitcoin as …i0. Image sha256: …. Signed on 2026-11-27.",
   "address": "0x…",
   "signature": "0x…"
 }
@@ -128,7 +145,8 @@ The signature is an Ethereum personal message signature (EIP-191), 65 bytes `r�
    `cast wallet verify --address <address> "<statement>" <signature>` or
    `eth_account.Account.recover_message`.
 2. Compare the result with `address`.
-3. Compare the sha256 in the statement with the sha256 of the manifesto text you hold.
+3. Check that the statement names inscription `1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0` and sha256 `441e1c2ae342848f…` (see above for
+   how to hash the inscribed file yourself).
 
 The app's Check a signature tab does the same three steps on the local machine
 (`src/sigcheck.cpp`: Keccak-256, public key recovery through libsecp256k1, EIP-55 addresses).
@@ -173,11 +191,12 @@ python3 -m venv tests/.venv && tests/.venv/bin/pip install eth-account
 tests/.venv/bin/python tests/sig_interop.py tests/work/sig_host
 ```
 
-`tests/ui-smoke.mjs` (52 checks, each run from an empty profile) launches the standalone host headless with an isolated profile. It
+`tests/ui-smoke.mjs` (55 checks, each run from an empty profile) launches the standalone host headless with an isolated profile. It
 checks the text, hash and statement in the view; that the app made its key in an owner-only file
 and shows it nowhere; that Sign produces one receipt and signing again replaces it; and the Check a
 signature tab over the app's own receipt and over receipts made by eth-account
-(`tests/make_fixtures.py`): valid, another text version, wrong address, edited statement, unrelated
+(`tests/make_fixtures.py`): valid, a receipt in the 0.1.0 to 0.1.5 form (naming the text), one
+naming another inscribed file, one naming another title, wrong address, edited statement, unrelated
 text. It also checks eleven kinds of transit damage that must still verify and twelve altered or
 incomplete receipts that must be refused. It then restarts the app three times: the key and receipt survive a restart, a damaged key file
 is left untouched with signing off and the receipt still listed, and restoring the file restores the

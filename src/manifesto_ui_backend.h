@@ -39,9 +39,12 @@ public:
     void onContextReady() override;
 
     // Pure helpers, also used by the checks at start-up.
-    static QString buildStatement(const QString& title, const QString& hashHex, const QString& isoDate);
+    static QString buildStatement(const QString& title, const QString& inscriptionId,
+                                  const QString& hashHex, const QString& isoDate);
     // Splits a statement back into its parts. False when it is not ours.
-    static bool parseStatement(const QString& statement, QString& title, QString& hashHex, QString& isoDate);
+    // inscriptionId comes back empty for the earlier, text-hash form.
+    static bool parseStatement(const QString& statement, QString& title, QString& inscriptionId,
+                               QString& hashHex, QString& isoDate);
     // The whole check of one receipt object, against `currentHash`.
     static QJsonObject checkReceipt(const QJsonObject& receipt, const QString& currentHash);
     // Finds the statement, address and signature in text that is no longer

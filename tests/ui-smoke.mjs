@@ -189,13 +189,16 @@ async function check(receipt, want) {
       const id = await rootProp("buildId");
       if (!/^manifesto_ui\//.test(id)) throw new Error(`buildId = ${id}`);
     });
-    await step("bundled text hash matches src/manifesto.txt", async () => {
+    await step("the app signs the Bitcoin inscription, and shows the bundled text's own hash", async () => {
       const h = await prop("hashMarker", "text");
-      if (h !== fx.hash) throw new Error(`view ${h}, file ${fx.hash}`);
+      if (h !== fx.hash) throw new Error(`signed hash ${h}, inscription ${fx.hash}`);
+      if ((await prop("inscriptionMarker", "text")) !== fx.inscription) throw new Error("inscription id");
+      const th = await prop("textHashMarker", "text");
+      if (th !== fx.textHash) throw new Error(`text hash ${th}, file ${fx.textHash}`);
     });
     await step("manifesto text is shown", async () => {
       const t = await prop("manifestoBody", "text");
-      if (!t.startsWith("Logos: A Declaration of Independence in Cyberspace") || !t.trim().endsWith("can experience it."))
+      if (!t.startsWith("Logos: A Declaration of Independence in Cyberspace") || !t.trim().endsWith("can experience it.\n\nHack the planet!"))
         throw new Error(`body is ${t.length} chars`);
     });
     await step("the reading view keeps every paragraph, in order, with nothing added", async () => {
@@ -204,8 +207,8 @@ async function check(receipt, want) {
       if (want.some((k, i) => kinds[i] !== k)) throw new Error(`starts ${kinds.slice(0, 4)}`);
       if (kinds[kinds.length - 1] !== "closing") throw new Error(`ends ${kinds[kinds.length - 1]}`);
       if (!kinds.includes("question") || kinds.filter((k) => k === "credo").length < 6) throw new Error(`kinds ${kinds}`);
-      // 31 paragraphs after the title block, plus title and author.
-      if (kinds.length !== 33) throw new Error(`${kinds.length} blocks`);
+      // 32 paragraphs after the title block, plus title and author.
+      if (kinds.length !== 34) throw new Error(`${kinds.length} blocks`);
     });
     await step("the manifesto scrolls: its content is taller than the view and moves", async () => {
       const before = await props("manifestoScroll");
@@ -220,7 +223,7 @@ async function check(receipt, want) {
     });
     await step("statement is one line naming the hash and the date", async () => {
       const s = await prop("statementMarker", "text");
-      const want = `I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace". Text sha256: ${fx.hash}. Signed on 2026-11-26.`;
+      const want = `I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace", inscribed on Bitcoin as ${fx.inscription}. Image sha256: ${fx.hash}. Signed on 2026-11-26.`;
       if (s !== want) throw new Error(s);
     });
     await step("the app is ready to sign with its own key", () => waitFor(async () =>
@@ -297,7 +300,9 @@ async function check(receipt, want) {
       if (shown !== fx.address) throw new Error(`shown ${shown}, signer ${fx.address}`);
     });
     await screenshot("03-valid.png");
-    await step("a signature over another text version is flagged", () => check(fx.otherText, "valid-other-text"));
+    await step("a receipt from an earlier version (naming the text, not the inscription) is flagged", () => check(fx.otherText, "valid-other-text"));
+    await step("a signature naming another inscribed file is flagged", () => check(fx.otherFile, "valid-other-text"));
+    await step("a signature naming another title is flagged", () => check(fx.otherTitle, "valid-other-text"));
     await step("a receipt naming another address is refused", () => check(fx.wrongAddress, "invalid"));
     await step("an edited statement is refused", () => check(fx.edited, "invalid"));
     await step("a signature over unrelated text is refused", () => check(fx.notOurs, "invalid"));
@@ -365,6 +370,12 @@ async function check(receipt, want) {
       if ((await prop("receiptsMarker", "text")) !== "1") throw new Error(`${await prop("receiptsMarker", "text")} receipts`);
     });
     await screenshot("05-damaged-key.png");
+    await step("a receipt saved by an earlier version is still listed, as an earlier version", async () => {
+      const dir = path.join(path.dirname(keyFile), "receipts");
+      fs.writeFileSync(path.join(dir, fx.otherText.address.toLowerCase().slice(2) + "-12ad498e11d3.json"), JSON.stringify(fx.otherText, null, 2));
+      await relaunch();
+      await waitFor(async () => (await prop("receiptsMarker", "text")) === "2", 10000, "two receipts listed");
+    });
     await step("putting the key file back restores the same address", async () => {
       await stop();
       fs.writeFileSync(keyFile, keyBytes);

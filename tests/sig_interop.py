@@ -38,9 +38,10 @@ def host(*args):
     return r.returncode, r.stdout.strip()
 
 
-def statement(text_hash, date="2026-11-26"):
-    return ('I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace". '
-            f"Text sha256: {text_hash}. Signed on {date}.")
+def statement(h, date="2026-11-26"):
+    return ('I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace", inscribed on Bitcoin as '
+            '1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0. '
+            f"Image sha256: {h}. Signed on {date}.")
 
 
 check("selftest", host("selftest") == (0, "ok"))

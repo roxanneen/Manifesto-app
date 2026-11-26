@@ -10,8 +10,12 @@ class ManifestoUi
 
     PROP(QString manifestoTitle="" READONLY)
     PROP(QString manifestoText="" READONLY)
-    // sha256 of the manifesto text, lowercase hex: the version being signed.
+    // What every signature names: the sha256 of the manifesto file inscribed on
+    // Bitcoin, and that inscription's ID.
     PROP(QString manifestoHash="" READONLY)
+    PROP(QString inscriptionId="" READONLY)
+    // sha256 of the text shown in the app (for reference; it is not what is signed).
+    PROP(QString textSha256="" READONLY)
     // The exact line that is signed, for today's date.
     PROP(QString statement="" READONLY)
 

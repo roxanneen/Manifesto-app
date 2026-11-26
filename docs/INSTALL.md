@@ -138,10 +138,12 @@ On a Mac, click the Basecamp window and press the Command and Q keys together. O
 ## Step 3: Read and sign
 
 1. In the Manifesto app, read the text. It is "Logos: A Declaration of Independence in Cyberspace"
-   by Jarrad Hope, the same text as on <https://logos.co/manifesto>.
+   by Jarrad Hope, the text on <https://logos.co/manifesto>, ending with the line "Hack the planet!"
+   from the copy inscribed on Bitcoin.
 2. Below the text, under the heading **Sign it**, you see one line that starts with **I sign the
-   Logos manifesto**. That line is what you sign. It also holds a long code of letters and numbers,
-   which identifies the exact text you just read, and today's date.
+   Logos manifesto**. That line is what you sign. It names the copy of the manifesto inscribed on
+   Bitcoin, by two long codes of letters and numbers, and today's date. Because that copy can never
+   change, your signature always points at the same manifesto.
 3. Click **Sign the manifesto**.
 4. A green box says **You signed the manifesto**. You are done.
 
@@ -150,7 +152,9 @@ name starts with **Your signatures**. To share it with someone, click **Copy rec
 wherever you like. Nothing is sent anywhere unless you share it yourself.
 
 To check a receipt someone sent you, open the **Check a signature** tab, paste the receipt and click
-**Check**. A green box means the signature is genuine and is for the same text you see in the app.
+**Check**. A green box means the signature is genuine and names the same copy of the manifesto, the one
+inscribed on Bitcoin. A yellow box means the signature is genuine but names a different version, for
+example one made with an older version of this app.
 
 ## What happens on your computer
 

@@ -57,6 +57,8 @@ Item {
         return out
     }
     readonly property string manifestoHash: ready && backend && backend.manifestoHash ? backend.manifestoHash : ""
+    readonly property string inscriptionId: ready && backend && backend.inscriptionId ? backend.inscriptionId : ""
+    readonly property string textSha256: ready && backend && backend.textSha256 ? backend.textSha256 : ""
     readonly property string statement: ready && backend && backend.statement ? backend.statement : ""
     readonly property string signerState: ready && backend && backend.signerState ? backend.signerState : "checking"
     readonly property string signerInfo: ready && backend && backend.signerInfo ? backend.signerInfo : ""
@@ -112,6 +114,8 @@ Item {
     Text { objectName: "manifestoBody"; visible: false; text: root.manifestoText }
     Text { objectName: "blocksMarker"; visible: false; text: root.manifestoBlocks.map(function (b) { return b.kind }).join(",") }
     Text { objectName: "hashMarker"; visible: false; text: root.manifestoHash }
+    Text { objectName: "inscriptionMarker"; visible: false; text: root.inscriptionId }
+    Text { objectName: "textHashMarker"; visible: false; text: root.textSha256 }
     Text { objectName: "statementMarker"; visible: false; text: root.statement }
     Text { objectName: "ownAddressMarker"; visible: false; text: root.ready && root.backend && root.backend.appKeyAddress ? root.backend.appKeyAddress : "" }
     Text { objectName: "receiptsMarker"; visible: false; text: String(root.receipts.length) }
@@ -373,7 +377,7 @@ Item {
                     wrapMode: Text.WordWrap
                     color: Theme.palette.textTertiary
                     font.pixelSize: Theme.typography.secondaryText
-                    text: "Text by Jarrad Hope. Source: logos.co/manifesto. This app is an unofficial hobby project. It is not a Logos product and is not endorsed by Logos or by the author."
+                    text: "Text by Jarrad Hope. Source: logos.co/manifesto, with the closing line \"Hack the planet!\" from the copy inscribed on Bitcoin. This app is an unofficial hobby project. It is not a Logos product and is not endorsed by Logos or by the author."
                 }
 
                 LogosFrame {
@@ -395,7 +399,7 @@ Item {
                             wrapMode: Text.WordWrap
                             color: Theme.palette.textSecondary
                             font.pixelSize: Theme.typography.secondaryText
-                            text: "You sign this one line. The sha256 value identifies the exact text above."
+                            text: "You sign this one line. It names the copy of the manifesto inscribed on Bitcoin, by its inscription ID and the sha256 of that file, so your signature points at a version nobody can change."
                         }
                         LogosText {
                             objectName: "statementText"
@@ -513,7 +517,7 @@ Item {
                                     Layout.fillWidth: true
                                     spacing: Theme.spacing.medium
                                     LogosBadge {
-                                        text: card.modelData.sameText ? "verified" : "verified, earlier text"
+                                        text: card.modelData.sameText ? "verified" : "verified, earlier version"
                                         color: card.modelData.sameText ? Theme.palette.success : Theme.palette.warning
                                     }
                                     LogosText {
@@ -634,14 +638,16 @@ Item {
                                   : (root.verifyResult.sameText ? LogosNotice.Success : LogosNotice.Warning)
                         title: !root.verifyResult.valid ? "Not a valid signature"
                                : (root.verifyResult.sameText ? "Valid signature of this manifesto"
-                                  : "Valid signature, of a different text")
+                                  : "Valid signature, of a different version")
                         message: !root.verifyResult.valid ? (root.verifyResult.error || "")
                                  : (root.verifyResult.sameText
                                     ? "Signed by " + root.verifyResult.address + " on " + root.verifyResult.date + ". The date is the signer's own statement."
                                       + root.repairedNote
                                     : "Signed by " + root.verifyResult.address + " on " + root.verifyResult.date
-                                      + ", over a text with sha256 " + root.verifyResult.hash
-                                      + ". The manifesto in this app has " + root.manifestoHash + "." + root.repairedNote)
+                                      + (root.verifyResult.inscription
+                                         ? ", naming a different title, inscription or file (sha256 " + root.verifyResult.hash + ")"
+                                         : " with an earlier version of this app. That version named the app's own copy of the text (sha256 " + root.verifyResult.hash + "), not the copy inscribed on Bitcoin")
+                                      + ". This app signs the inscription " + root.inscriptionId + ", sha256 " + root.manifestoHash + "." + root.repairedNote)
                     }
                     LogosText {
                         Layout.fillWidth: true
@@ -660,7 +666,7 @@ Item {
             elide: Text.ElideMiddle
             color: Theme.palette.textTertiary
             font.pixelSize: Theme.typography.secondaryText
-            text: "Text sha256 " + root.manifestoHash + "   " + root.buildId
+            text: "Signs Bitcoin inscription " + root.inscriptionId.slice(0, 8) + "…" + root.inscriptionId.slice(-6) + ", sha256 " + root.manifestoHash.slice(0, 8) + "…   " + root.buildId
         }
     }
 }

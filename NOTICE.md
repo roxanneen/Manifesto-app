@@ -14,8 +14,9 @@ app.
 
 Source: <https://logos.co/manifesto>
 
-It was copied from that page on 26 November 2026 and checked against it word for word. It is
-included so the app can show the text and so every signature can name the exact version signed. The
+It was copied from that page on 26 November 2026 and checked against it word for word. The closing
+line "Hack the planet!" is taken from the copy inscribed on Bitcoin (inscription `1c3990078b6a4e68d2e5c87c88cff9782f261cb22b5375bfc1cdbe711cbf4686i0`), where it is
+the last line. The text is included so the app can show it. Signatures name the inscribed copy. The
 text belongs to its author and to Logos. The licences in this repository cover the app's code, not
 the manifesto.
 
