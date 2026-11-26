@@ -19,8 +19,6 @@ The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad 
 
 ![The Manifesto app on a fresh install: the manifesto and the line you sign](docs/screenshot.png)
 
-![The end of the manifesto, with "Hack the planet!"](docs/screenshot-ending.png)
-
 ## Status
 
 Version 0.1.6, 26 November 2026. This version signs and verifies on one computer and exports the
