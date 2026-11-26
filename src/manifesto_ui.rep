@@ -1,0 +1,54 @@
+class ManifestoUi
+{
+    // Re-read the accounts the Signer knows about.
+    SLOT(void refreshAccounts())
+    // Sign the statement with this address. The app's own key signs at once;
+    // a Signer account is signed only after the person approves it there.
+    SLOT(void sign(QString address))
+    // Give up on the request that is waiting in the Signer.
+    SLOT(void cancelSign())
+    // Check any receipt (the JSON this app exports). Result in verifyResultJson.
+    SLOT(void verifyReceipt(QString receiptJson))
+    // Delete one saved receipt of our own, by the file the receipts list names.
+    // The signature itself cannot be undone.
+    SLOT(void removeReceipt(QString file))
+
+    PROP(QString manifestoTitle="" READONLY)
+    PROP(QString manifestoText="" READONLY)
+    // sha256 of the manifesto text, lowercase hex: the version being signed.
+    PROP(QString manifestoHash="" READONLY)
+    // The exact text the Signer will show and sign, for today's date.
+    PROP(QString statement="" READONLY)
+
+    // The address of the key this app made for itself on first run, and the
+    // file that holds the key (shown so the person can back it up).
+    PROP(QString appKeyAddress="" READONLY)
+    PROP(QString appKeyFile="" READONLY)
+
+    // checking | ready | error
+    PROP(QString signerState="checking" READONLY)
+    PROP(QString signerInfo="" READONLY)
+    // First row is the app's own key ("own": true); any others are accounts
+    // the Signer lists.
+    // [{ "address": "0x…", "label": "…", "signer": "…", "own": false, "available": true, "signed": false }]
+    PROP(QString accountsJson="[]" READONLY)
+
+    // idle | requesting | awaiting | signing | signed | rejected | error
+    PROP(QString signState="idle" READONLY)
+    PROP(QString signInfo="" READONLY)
+    // The Signer's name for the waiting request: the view raises
+    // evm.signing.approve with it so the Signer comes forward.
+    PROP(QString pendingHandle="" READONLY)
+
+    // Our own receipts, newest first: [{ address, statement, signature, date, file }]
+    PROP(QString receiptsJson="[]" READONLY)
+    // { checked, valid, sameText, address, date, hash, statement, error }
+    PROP(QString verifyResultJson="{}" READONLY)
+
+    // A checked receipt that could not be written to disk, so the view can
+    // offer it for copying. Empty otherwise.
+    PROP(QString unsavedReceiptJson="" READONLY)
+
+    PROP(QString buildId="" READONLY)
+    PROP(QString dataDir="" READONLY)
+}

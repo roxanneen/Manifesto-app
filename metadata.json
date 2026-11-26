@@ -1,0 +1,34 @@
+{
+  "name": "manifesto_ui",
+  "display_name": "Manifesto",
+  "version": "0.1.0",
+  "type": "ui_qml",
+  "interface": "universal",
+  "category": "social",
+  "description": "Read the Logos manifesto and sign it in one click, with a key the app makes for you. Anyone can check the signature without a server.",
+  "main": "manifesto_ui_plugin",
+  "icon": "icons/manifesto.png",
+  "view": "qml/Main.qml",
+  "dependencies": [],
+  "optional_dependencies": [
+    { "name": "signer_manager_module", "version": "~0.2.0" }
+  ],
+  "uses": [
+    { "intent": "evm.signing.approve" }
+  ],
+  "codegen": { "rep": "src/manifesto_ui.rep" },
+
+  "nix": {
+    "packages": {
+      "build": [],
+      "runtime": ["secp256k1"]
+    },
+    "external_libraries": [],
+    "cmake": {
+      "find_packages": [],
+      "extra_sources": [],
+      "extra_include_dirs": [],
+      "extra_link_libraries": []
+    }
+  }
+}

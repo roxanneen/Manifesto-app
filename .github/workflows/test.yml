@@ -1,0 +1,84 @@
+name: test
+
+# Runs every test on Linux and macOS: the signature code against eth-account,
+# then the app itself, headless, signing with a key it makes in a throwaway
+# profile, then an outside check of the receipt it produced.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x86_64
+          - os: ubuntu-24.04-arm
+            platform: linux-aarch64
+          - os: macos-latest
+            platform: darwin-arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install eth-account (the independent implementation)
+        run: python -m pip install eth-account
+
+      - name: Signature code against eth-account
+        run: |
+          mkdir -p tests/work
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            sudo apt-get update -q && sudo apt-get install -y -q libsecp256k1-dev
+            c++ -std=c++17 -Wall -Isrc src/sigcheck.cpp tests/sig_host.cpp -lsecp256k1 -o tests/work/sig_host
+          else
+            brew install secp256k1
+            P=$(brew --prefix secp256k1)
+            c++ -std=c++17 -Wall -Isrc -I"$P/include" src/sigcheck.cpp tests/sig_host.cpp -L"$P/lib" -lsecp256k1 -o tests/work/sig_host
+          fi
+          python tests/sig_interop.py tests/work/sig_host
+
+      - name: Build the standalone dev host
+        run: nix build .#ui-dev -L -o result-ui-dev
+
+      - name: The app, headless
+        env:
+          MANIFESTO_RUN: ${{ github.workspace }}/result-ui-dev/bin/run-logos-standalone-ui
+          MANIFESTO_WORK: ${{ github.workspace }}/tests/work/smoke
+          MANIFESTO_FIXTURES: ${{ github.workspace }}/tests/work/fixtures.json
+        run: |
+          python tests/make_fixtures.py tests/work/fixtures.json
+          node tests/ui-smoke.mjs
+
+      - name: Outside check of the receipt the app made
+        run: |
+          python tests/check_receipt.py tests/work/smoke/signed-receipt.json \
+            tests/work/smoke/home/basecamp/module_data/manifesto_ui/signing-key
+
+      - name: Upload screenshots and log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ matrix.platform }}
+          path: |
+            tests/work/smoke/*.png
+            tests/work/smoke/app.log
+          if-no-files-found: warn
