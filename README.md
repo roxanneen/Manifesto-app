@@ -40,13 +40,14 @@ The full walkthrough, including installing Basecamp itself, is in
 
 1. Install [Logos Basecamp](https://github.com/logos-co/logos-basecamp/releases/latest) 0.3.2 or
    newer.
-2. In Basecamp open **Package Manager**, then **Manage Repositories**, and add this catalogue:
+2. In Basecamp click **Applications** in the menu on the right, then **Manage Repositories**, and
+   paste this address into **Add a repository**:
 
    ```
    https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
    ```
 
-3. Install **Manifesto** from the Package Manager list. The package is signed by the publisher
+3. Go back to **Applications**, scroll down to **Basecamp apps by thehat** and click **Manifesto**. The package is signed by the publisher
    **thehat**, key fingerprint `6AB9 AD2D 6E8D FA6D`; the catalogue has a page at <https://roxanneen.github.io/basecamp-apps/>.
 4. Open **Manifesto** and click **Sign the manifesto**.
 

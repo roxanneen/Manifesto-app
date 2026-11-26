@@ -80,18 +80,17 @@ There are two ways. The first is shorter and also brings you updates later.
 A catalogue is a list of apps that Basecamp can install for you. This one is published by the same
 person as the Manifesto app, under the name **thehat**, and its packages are signed.
 
-1. In the Basecamp window, look at the icons along the side. Hold the mouse over each one for a
-   moment to see its name, and click **Package Manager**.
-2. Click **Manage Repositories**. If you do not see that button, open Basecamp's **Settings** and
-   choose **Package Repositories**.
-3. Find the field called **Add a repository**. Copy the address below, paste it into that field and
-   add it:
+1. In Basecamp, click **Applications** in the menu on the right.
+2. Click **Manage Repositories**.
+3. Find the box called **Add a repository**. Copy the address below, paste it into that box and
+   click **Add**:
 
    ```
    https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
    ```
 
-4. Go back to **Package Manager**. Find **Manifesto** in the list and install it.
+4. Go back to **Applications** and scroll down until you reach **Basecamp apps by thehat**. Click
+   **Manifesto** to install it.
 
    Newer versions of Basecamp then show who signed it, with a short code called a fingerprint, and
    a button **Trust & install**. The publisher is **thehat** and the fingerprint must be exactly:
@@ -212,10 +211,11 @@ Facts you need:
   Ignore the setup.exe file (Windows, not supported here) and the Source code files.
 - Mac: open the .dmg, drag LogosBasecamp onto Applications, open it from Applications.
   Linux: allow the .AppImage file to run as a program, then double-click it.
-- Preferred way to add the app: in Basecamp open Package Manager, then Manage Repositories (or
-  Settings, then Package Repositories), paste this address into "Add a repository" and add it:
+- Preferred way to add the app: in Basecamp click "Applications" in the menu on the right, then
+  "Manage Repositories", paste this address into "Add a repository" and click "Add":
   https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
-  Then install "Manifesto" from the Package Manager list. It is signed by the publisher "thehat".
+  Then go back to "Applications", scroll down to "Basecamp apps by thehat" and click "Manifesto".
+  It is signed by the publisher "thehat".
   If Basecamp shows a fingerprint and a "Trust & install" button, the fingerprint must be exactly
   6AB9 AD2D 6E8D FA6D. If it matches, click "Trust & install"; if not, stop.
 - Fallback: download this one file (it is the same for every supported computer, and signed by
