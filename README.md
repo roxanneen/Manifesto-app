@@ -50,12 +50,27 @@ The full walkthrough, including installing Basecamp itself, is in
    **thehat**; the catalogue is [roxanneen/basecamp-apps](https://github.com/roxanneen/basecamp-apps).
 4. Open **Manifesto** and click **Sign the manifesto**.
 
-Without the catalogue: download the `.lgx` for your computer from the
-[latest release](https://github.com/roxanneen/Manifesto-app/releases/latest)
-(`manifesto_ui-darwin-arm64.lgx`, `manifesto_ui-linux-x86_64.lgx` or
-`manifesto_ui-linux-aarch64.lgx`), then use **Install Local Package** in Package Manager. Those
-release files are not signed; each ships with a `.sha256` file to compare against. The app depends on
-no other module.
+Without the catalogue: download
+[`manifesto_ui.lgx`](https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx)
+and use **Install Local Package** in Package Manager. It is the same signed package the catalogue
+serves, one file for all three platforms. The app depends on no other module.
+
+The release also carries `manifesto_ui-darwin-arm64.lgx`, `manifesto_ui-linux-x86_64.lgx` and
+`manifesto_ui-linux-aarch64.lgx`. Those are the unsigned per-platform builds from CI that the signed
+package is made from. Most people should ignore them.
+
+## Releasing a new version
+
+1. Bump `version` in `metadata.json`, push, and wait for the `test` workflow to pass.
+2. Publish a GitHub release for the new tag **as a pre-release**. The `release-lgx` workflow attaches
+   the three per-platform packages.
+3. On the computer that holds the publisher key, run `scripts/release.sh` in
+   [roxanneen/basecamp-apps](https://github.com/roxanneen/basecamp-apps). It merges and signs the
+   package, updates the catalogue, attaches `manifesto_ui.lgx` to the release and makes the release
+   the latest.
+
+Until step 3, the previous version stays the latest release, so the download link in the guide
+never points at a release without the signed file.
 
 ## What is signed
 

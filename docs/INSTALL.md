@@ -29,9 +29,9 @@ This works on **desktop and laptop computers running macOS or Linux**.
 **About This Mac**. If the line says **Chip: Apple M1** (or M2, M3, M4), you are fine. If it says
 **Processor: Intel**, this will not work on that Mac.
 
-**Not sure which Linux file you need?** Open the Terminal app, type `uname -m` and press Enter. If it
-answers `x86_64`, you need the files with `x86_64` in the name. If it answers `aarch64`, you need the
-files with `aarch64` in the name.
+**Not sure which Linux file of Basecamp you need?** Open the Terminal app, type `uname -m` and press
+Enter. If it answers `x86_64`, you need the Basecamp file with `x86_64` in the name. If it answers
+`aarch64`, you need the one with `aarch64` in the name.
 
 ## Step 1: Install Logos Basecamp
 
@@ -100,33 +100,24 @@ Presence pilot). You do not need them to sign the manifesto.
 
 ### Way 2: download the file yourself
 
-Use this if the catalogue does not work for you.
+Use this if the catalogue does not work for you. The file is the same signed package the catalogue
+serves, and it is one file for every supported computer.
 
-1. Open this page: <https://github.com/roxanneen/Manifesto-app/releases/latest>
-2. Scroll down to **Assets** and click the file for your computer. Pick the name that ends in
-   `.lgx`. Ignore the files ending in `.sha256` and the two called **Source code**.
-
-   | Your computer | File to download |
-   |---|---|
-   | Mac with an Apple chip | `manifesto_ui-darwin-arm64.lgx` |
-   | Linux, Intel or AMD | `manifesto_ui-linux-x86_64.lgx` |
-   | Linux, ARM | `manifesto_ui-linux-aarch64.lgx` |
-
-3. Your browser saves the file, usually in your Downloads folder. You should now see a file there
-   whose name starts with `manifesto_ui-` and ends in `.lgx`. Leave it closed. Basecamp opens it in
-   the next step.
-4. In the Basecamp window, look at the icons along the side. Hold the mouse over each one for a
+1. Click this link to download the app: <https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx>
+2. Your browser saves a file called `manifesto_ui.lgx`, usually in your Downloads folder. Leave it
+   closed. Basecamp opens it in the next steps.
+3. In the Basecamp window, look at the icons along the side. Hold the mouse over each one for a
    moment to see its name, and click **Package Manager**. You are in the right place when you see
    the heading **Packages** and a button called **Install Local Package**.
-5. Click **Install Local Package**.
-6. A file window opens. Go to your Downloads folder and click the file whose name starts with
-   `manifesto_ui-` and ends in `.lgx`. Then click **Open**.
-7. A box titled **Install Package?** appears. It says the package is unsigned. That is expected for
-   a file you add by hand, and it has nothing to do with your own signature on the manifesto. The Manifesto app
-   needs no other packages. Click the button that confirms the install. Nothing is installed until
-   you do.
-8. Wait a few seconds for the install to finish.
-9. **Manifesto** now appears among your apps in Basecamp. Look for it in the same side bar or in the
+4. Click **Install Local Package**.
+5. A file window opens. Go to your Downloads folder and click the file called `manifesto_ui.lgx`.
+   Then click **Open**.
+6. A box titled **Install Package?** appears. The package is signed by the publisher **thehat**.
+   Because you added the file by hand, Basecamp may say it does not know this publisher yet. That is
+   expected. The Manifesto app needs no other packages. Click the button that confirms the install.
+   Nothing is installed until you do.
+7. Wait a few seconds for the install to finish.
+8. **Manifesto** now appears among your apps in Basecamp. Look for it in the same side bar or in the
    list of applications, and click it to open it.
 
 If you do not see Manifesto, quit Basecamp and open it again. Closing the window may not be enough.
@@ -175,7 +166,7 @@ difficult, skip it. A new computer makes a new key and you can sign again.
 | You use Windows, an Intel Mac, a phone or a tablet | The Manifesto app has no version for these, even though Basecamp offers a Windows file. See the table at the top of this guide |
 | macOS will not open Basecamp | Open **System Settings**, then **Privacy & Security**, scroll down and click **Open Anyway** next to LogosBasecamp. Your Mac may ask for your Mac password to allow this |
 | On Linux, double-clicking the AppImage does nothing | The file may not be allowed to run yet. Repeat the Linux part of Step 1. If it still does not start, open a terminal in your Downloads folder, type `./` followed by the file name, press Enter, and copy the message it prints into a report (link below) |
-| Basecamp says the package is unsigned | This is about the app file and has nothing to do with your signature on the manifesto. The file carries no publisher's seal, which is expected when you add the file by hand (Way 2). If you downloaded it from the page in Step 2, carry on. Installing from the catalogue (Way 1) avoids this message |
+| Basecamp says it does not know the publisher, or that the package is unsigned | This is about the app file and has nothing to do with your signature on the manifesto. Check that you downloaded the file from the link in Step 2, then carry on. Installing from the catalogue (Way 1) avoids this message |
 | Manifesto does not appear after installing | Quit Basecamp and open it again (see the end of Step 2) |
 | The app says **Signing is off** | Quit Basecamp and open it again (see the end of Step 2). If the message stays, report it using the link below and copy the message into your report |
 
@@ -206,16 +197,15 @@ Facts you need:
   Ignore the setup.exe file (Windows, not supported here) and the Source code files.
 - Mac: open the .dmg, drag LogosBasecamp onto Applications, open it from Applications.
   Linux: allow the .AppImage file to run as a program, then double-click it.
-- Manifesto app download: https://github.com/roxanneen/Manifesto-app/releases/latest
-  Files: manifesto_ui-darwin-arm64.lgx, manifesto_ui-linux-x86_64.lgx, manifesto_ui-linux-aarch64.lgx
-  Ignore the .sha256 files and the Source code files.
 - Preferred way to add the app: in Basecamp open Package Manager, then Manage Repositories (or
   Settings, then Package Repositories), paste this address into "Add a repository" and add it:
   https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
   Then install "Manifesto" from the Package Manager list. It is signed by the publisher "thehat".
-- Fallback: download the .lgx file for my computer, then in Basecamp: Package Manager, Install
-  Local Package, choose the file, confirm the "Install Package?" box. It then says the package is
-  unsigned; that is expected for a file added by hand. The app needs no other packages.
+- Fallback: download this one file (it is the same for every supported computer, and signed by
+  "thehat"): https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx
+  Then in Basecamp: Package Manager, Install Local Package, choose the file, confirm the
+  "Install Package?" box. Basecamp may say it does not know the publisher yet; that is expected
+  for a file added by hand. The app needs no other packages.
 - Then open the Manifesto app and click "Sign the manifesto". A green box confirms it.
 - The Manifesto app and Basecamp never need an account, a wallet, a payment or a password. The one
   exception is my own computer asking for my computer password to allow a newly downloaded app to
@@ -224,19 +214,19 @@ Facts you need:
 
 ## For AI assistants and people who prefer a terminal
 
-The Manifesto download can be done in a terminal. Replace `<platform>` with `darwin-arm64`,
-`linux-x86_64` or `linux-aarch64`.
+The Manifesto download can be done in a terminal. It is one file for every supported computer.
 
 ```bash
-curl -L -o manifesto_ui.lgx https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui-<platform>.lgx
+curl -L -o manifesto_ui.lgx https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx
 ```
 
 ```bash
-curl -L -o manifesto_ui.lgx.sha256 https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui-<platform>.lgx.sha256
+curl -L -o manifesto_ui.lgx.sha256 https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx.sha256
 ```
 
 The `.sha256` file holds the expected checksum of the package. Compare it with the output of
-`shasum -a 256 manifesto_ui.lgx` on macOS or `sha256sum manifesto_ui.lgx` on Linux.
+`shasum -a 256 manifesto_ui.lgx` on macOS or `sha256sum manifesto_ui.lgx` on Linux. The package is
+signed by the publisher key listed at <https://github.com/roxanneen/basecamp-apps>.
 
 Then install the file through Basecamp's **Package Manager** with **Install Local Package**, as in
 Step 2, Way 2. If you have the `lgpm` command-line tool, it does the same. Set `PROFILE` first:
