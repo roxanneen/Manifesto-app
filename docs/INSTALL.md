@@ -71,7 +71,36 @@ files with `aarch64` in the name.
 
 You need Basecamp version 0.3.2 or newer. The link above always gives you the newest one.
 
-## Step 2: Download the Manifesto app
+## Step 2: Add the Manifesto app to Basecamp
+
+There are two ways. The first is shorter and also brings you updates later.
+
+### Way 1 (recommended): from the catalogue
+
+A catalogue is a list of apps that Basecamp can install for you. This one is published by the same
+person as the Manifesto app, under the name **thehat**, and its packages are signed.
+
+1. In the Basecamp window, look at the icons along the side. Hold the mouse over each one for a
+   moment to see its name, and click **Package Manager**.
+2. Click **Manage Repositories**. If you do not see that button, open Basecamp's **Settings** and
+   choose **Package Repositories**.
+3. Find the field called **Add a repository**. Copy the address below, paste it into that field and
+   add it:
+
+   ```
+   https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
+   ```
+
+4. Go back to **Package Manager**. Find **Manifesto** in the list and install it. Basecamp should
+   show it as signed by a trusted publisher. Confirm the install.
+5. **Manifesto** now appears among your apps in Basecamp. Click it to open it.
+
+The same catalogue also lists three other apps by the same publisher (OneSecret, Chess and a
+Presence pilot). You do not need them to sign the manifesto.
+
+### Way 2: download the file yourself
+
+Use this if the catalogue does not work for you.
 
 1. Open this page: <https://github.com/roxanneen/Manifesto-app/releases/latest>
 2. Scroll down to **Assets** and click the file for your computer. Pick the name that ends in
@@ -86,28 +115,25 @@ You need Basecamp version 0.3.2 or newer. The link above always gives you the ne
 3. Your browser saves the file, usually in your Downloads folder. You should now see a file there
    whose name starts with `manifesto_ui-` and ends in `.lgx`. Leave it closed. Basecamp opens it in
    the next step.
-
-## Step 3: Add the Manifesto app to Basecamp
-
-1. In the Basecamp window, look at the icons along the side. Hold the mouse over each one for a
+4. In the Basecamp window, look at the icons along the side. Hold the mouse over each one for a
    moment to see its name, and click **Package Manager**. You are in the right place when you see
    the heading **Packages** and a button called **Install Local Package**.
-2. Click **Install Local Package**.
-3. A file window opens. Go to your Downloads folder and click the file whose name starts with
+5. Click **Install Local Package**.
+6. A file window opens. Go to your Downloads folder and click the file whose name starts with
    `manifesto_ui-` and ends in `.lgx`. Then click **Open**.
-4. A box titled **Install Package?** appears. It says the package is unsigned. That is expected for
-   this app, and it has nothing to do with your own signature on the manifesto. The Manifesto app
+7. A box titled **Install Package?** appears. It says the package is unsigned. That is expected for
+   a file you add by hand, and it has nothing to do with your own signature on the manifesto. The Manifesto app
    needs no other packages. Click the button that confirms the install. Nothing is installed until
    you do.
-5. Wait a few seconds for the install to finish.
-6. **Manifesto** now appears among your apps in Basecamp. Look for it in the same side bar or in the
+8. Wait a few seconds for the install to finish.
+9. **Manifesto** now appears among your apps in Basecamp. Look for it in the same side bar or in the
    list of applications, and click it to open it.
 
 If you do not see Manifesto, quit Basecamp and open it again. Closing the window may not be enough.
 On a Mac, click the Basecamp window and press the Command and Q keys together. On Linux, choose
 **Quit** from Basecamp's menu, or right-click its small icon near the clock and choose **Quit**.
 
-## Step 4: Read and sign
+## Step 3: Read and sign
 
 1. In the Manifesto app, read the text. It is "Logos: A Declaration of Independence in Cyberspace"
    by Jarrad Hope, the same text as on <https://logos.co/manifesto>.
@@ -149,9 +175,9 @@ difficult, skip it. A new computer makes a new key and you can sign again.
 | You use Windows, an Intel Mac, a phone or a tablet | The Manifesto app has no version for these, even though Basecamp offers a Windows file. See the table at the top of this guide |
 | macOS will not open Basecamp | Open **System Settings**, then **Privacy & Security**, scroll down and click **Open Anyway** next to LogosBasecamp. Your Mac may ask for your Mac password to allow this |
 | On Linux, double-clicking the AppImage does nothing | The file may not be allowed to run yet. Repeat the Linux part of Step 1. If it still does not start, open a terminal in your Downloads folder, type `./` followed by the file name, press Enter, and copy the message it prints into a report (link below) |
-| Basecamp says the package is unsigned | This is about the app file and has nothing to do with your signature on the manifesto. The file carries no publisher's seal, which is expected for this app. If you downloaded it from the page in Step 2, carry on |
-| Manifesto does not appear after installing | Quit Basecamp and open it again (see the end of Step 3) |
-| The app says **Signing is off** | Quit Basecamp and open it again (see the end of Step 3). If the message stays, report it using the link below and copy the message into your report |
+| Basecamp says the package is unsigned | This is about the app file and has nothing to do with your signature on the manifesto. The file carries no publisher's seal, which is expected when you add the file by hand (Way 2). If you downloaded it from the page in Step 2, carry on. Installing from the catalogue (Way 1) avoids this message |
+| Manifesto does not appear after installing | Quit Basecamp and open it again (see the end of Step 2) |
+| The app says **Signing is off** | Quit Basecamp and open it again (see the end of Step 2). If the message stays, report it using the link below and copy the message into your report |
 
 Report a problem here: <https://github.com/roxanneen/Manifesto-app/issues>. Reporting needs
 a free GitHub account. Installing and signing do not.
@@ -183,9 +209,13 @@ Facts you need:
 - Manifesto app download: https://github.com/roxanneen/Manifesto-app/releases/latest
   Files: manifesto_ui-darwin-arm64.lgx, manifesto_ui-linux-x86_64.lgx, manifesto_ui-linux-aarch64.lgx
   Ignore the .sha256 files and the Source code files.
-- In Basecamp: Package Manager, then Install Local Package, then choose the .lgx file, then
-  confirm the "Install Package?" box. It says the package is unsigned; that is expected. The app
-  needs no other packages.
+- Preferred way to add the app: in Basecamp open Package Manager, then Manage Repositories (or
+  Settings, then Package Repositories), paste this address into "Add a repository" and add it:
+  https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
+  Then install "Manifesto" from the Package Manager list. It is signed by the publisher "thehat".
+- Fallback: download the .lgx file for my computer, then in Basecamp: Package Manager, Install
+  Local Package, choose the file, confirm the "Install Package?" box. It then says the package is
+  unsigned; that is expected for a file added by hand. The app needs no other packages.
 - Then open the Manifesto app and click "Sign the manifesto". A green box confirms it.
 - The Manifesto app and Basecamp never need an account, a wallet, a payment or a password. The one
   exception is my own computer asking for my computer password to allow a newly downloaded app to
@@ -209,7 +239,7 @@ The `.sha256` file holds the expected checksum of the package. Compare it with t
 `shasum -a 256 manifesto_ui.lgx` on macOS or `sha256sum manifesto_ui.lgx` on Linux.
 
 Then install the file through Basecamp's **Package Manager** with **Install Local Package**, as in
-Step 3. If you have the `lgpm` command-line tool, it does the same. Set `PROFILE` first:
+Step 2, Way 2. If you have the `lgpm` command-line tool, it does the same. Set `PROFILE` first:
 `PROFILE="$HOME/Library/Application Support/Logos/LogosBasecamp"` on macOS or
 `PROFILE="$HOME/.local/share/Logos/LogosBasecamp"` on Linux.
 

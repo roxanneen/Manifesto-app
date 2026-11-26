@@ -40,21 +40,22 @@ The full walkthrough, including installing Basecamp itself, is in
 
 1. Install [Logos Basecamp](https://github.com/logos-co/logos-basecamp/releases/latest) 0.3.2 or
    newer.
-2. Download the `.lgx` for your computer from the
-   [latest release](https://github.com/roxanneen/Manifesto-app/releases/latest):
+2. In Basecamp open **Package Manager**, then **Manage Repositories**, and add this catalogue:
 
-   | Asset | Platform |
-   |---|---|
-   | `manifesto_ui-darwin-arm64.lgx` | macOS, Apple chip |
-   | `manifesto_ui-linux-x86_64.lgx` | Linux x86_64 |
-   | `manifesto_ui-linux-aarch64.lgx` | Linux ARM64 |
+   ```
+   https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
+   ```
 
-3. In Basecamp open **Package Manager**, click **Install Local Package**, choose the file and
-   confirm the **Install Package?** box.
+3. Install **Manifesto** from the Package Manager list. The package is signed by the publisher
+   **thehat**; the catalogue is [roxanneen/basecamp-apps](https://github.com/roxanneen/basecamp-apps).
 4. Open **Manifesto** and click **Sign the manifesto**.
 
-The package is not signed; each one ships with a `.sha256` file to compare against. The app depends
-on no other module.
+Without the catalogue: download the `.lgx` for your computer from the
+[latest release](https://github.com/roxanneen/Manifesto-app/releases/latest)
+(`manifesto_ui-darwin-arm64.lgx`, `manifesto_ui-linux-x86_64.lgx` or
+`manifesto_ui-linux-aarch64.lgx`), then use **Install Local Package** in Package Manager. Those
+release files are not signed; each ships with a `.sha256` file to compare against. The app depends on
+no other module.
 
 ## What is signed
 
