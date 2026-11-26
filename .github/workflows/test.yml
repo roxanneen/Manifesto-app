@@ -6,9 +6,19 @@ name: test
 
 on:
   workflow_dispatch:
+  # Changes that only touch the README, the guide or the screenshot cannot
+  # change the app, so they do not run the tests. Any other change does.
   push:
     branches: [main]
+    paths-ignore:
+      - README.md
+      - docs/INSTALL.md
+      - docs/screenshot.png
   pull_request:
+    paths-ignore:
+      - README.md
+      - docs/INSTALL.md
+      - docs/screenshot.png
 
 permissions:
   contents: read
