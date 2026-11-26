@@ -91,8 +91,18 @@ person as the Manifesto app, under the name **thehat**, and its packages are sig
    https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
    ```
 
-4. Go back to **Package Manager**. Find **Manifesto** in the list and install it. Basecamp should
-   show it as signed by a trusted publisher. Confirm the install.
+4. Go back to **Package Manager**. Find **Manifesto** in the list and install it.
+
+   Newer versions of Basecamp then show who signed it, with a short code called a fingerprint, and
+   a button **Trust & install**. The publisher is **thehat** and the fingerprint must be exactly:
+
+   **`6AB9 AD2D 6E8D FA6D`**
+
+   If it matches, click **Trust & install**. Basecamp remembers this publisher (you can see it later
+   under **Settings**, **Trusted Publishers**) and will not ask again. If the fingerprint is
+   different, stop: the package is not from this publisher.
+
+   Basecamp 0.3.2 does not show this step yet and installs straight away.
 5. **Manifesto** now appears among your apps in Basecamp. Click it to open it.
 
 The same catalogue also lists three other apps by the same publisher (OneSecret, Chess and a
@@ -202,6 +212,8 @@ Facts you need:
   Settings, then Package Repositories), paste this address into "Add a repository" and add it:
   https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
   Then install "Manifesto" from the Package Manager list. It is signed by the publisher "thehat".
+  If Basecamp shows a fingerprint and a "Trust & install" button, the fingerprint must be exactly
+  6AB9 AD2D 6E8D FA6D. If it matches, click "Trust & install"; if not, stop.
 - Fallback: download this one file (it is the same for every supported computer, and signed by
   "thehat"): https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx
   Then in Basecamp: Package Manager, Install Local Package, choose the file, confirm the

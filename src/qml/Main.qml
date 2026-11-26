@@ -22,6 +22,40 @@ Item {
     // --- backend state (auto-synced PROPs, defensively coerced) ---
     readonly property string manifestoTitle: ready && backend && backend.manifestoTitle ? backend.manifestoTitle : ""
     readonly property string manifestoText: ready && backend && backend.manifestoText ? backend.manifestoText : ""
+    // The manifesto split into blocks for display. The text itself is not
+    // changed: each block is a paragraph of manifestoText, in order, and
+    // joining them gives back every word. Kinds only choose a style.
+    readonly property var manifestoBlocks: {
+        var t = manifestoText
+        if (!t) return []
+        var paras = t.split(/\n\s*\n/).map(function (p) { return p.trim() }).filter(function (p) { return p.length > 0 })
+        var out = []
+        var m = 26, s = 20
+        // The closing run of short declarations ("Our world is anonymous ...")
+        // starts at the first short sentence among the last ten paragraphs and
+        // runs to the end.
+        var credoFrom = paras.length
+        for (var k = Math.max(1, paras.length - 10); k < paras.length - 1; k++)
+            if (paras[k].length <= 120 && paras[k].indexOf("\n") < 0 && !/\?$/.test(paras[k])) { credoFrom = k; break }
+        paras.forEach(function (p, i) {
+            if (i === 0) {
+                var lines = p.split("\n")
+                out.push({ kind: "title", text: lines[0], gap: 0 })
+                if (lines.length > 1) out.push({ kind: "author", text: lines.slice(1).join(" "), gap: 6 })
+                return
+            }
+            if (p.indexOf("Abstract. ") === 0) { out.push({ kind: "abstract", text: p.slice(10), gap: m }); return }
+            if (p.indexOf("Keywords\n") === 0) { out.push({ kind: "keywords", text: p.slice(9).trim(), gap: s }); return }
+            var prev = out[out.length - 1]
+            if (i === paras.length - 1) { out.push({ kind: "closing", text: p, gap: m }); return }
+            if (/\?$/.test(p)) { out.push({ kind: "question", text: p, gap: m + 8 }); return }
+            if (i >= credoFrom) {
+                out.push({ kind: "credo", text: p, gap: prev && prev.kind === "credo" ? 12 : m }); return
+            }
+            out.push({ kind: "body", text: p, gap: prev && prev.kind === "question" ? 12 : s })
+        })
+        return out
+    }
     readonly property string manifestoHash: ready && backend && backend.manifestoHash ? backend.manifestoHash : ""
     readonly property string statement: ready && backend && backend.statement ? backend.statement : ""
     readonly property string signerState: ready && backend && backend.signerState ? backend.signerState : "checking"
@@ -73,6 +107,7 @@ Item {
     // Hidden markers for headless tests: exact state words.
     Text { objectName: "signerMarker"; visible: false; text: root.signerState }
     Text { objectName: "signMarker"; visible: false; text: root.signState }
+    Text { objectName: "blocksMarker"; visible: false; text: root.manifestoBlocks.map(function (b) { return b.kind }).join(",") }
     Text { objectName: "hashMarker"; visible: false; text: root.manifestoHash }
     Text { objectName: "statementMarker"; visible: false; text: root.statement }
     Text { objectName: "ownAddressMarker"; visible: false; text: root.ready && root.backend && root.backend.appKeyAddress ? root.backend.appKeyAddress : "" }
@@ -145,14 +180,188 @@ Item {
                         clip: true
                         contentWidth: availableWidth
                         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                        LogosText {
-                            objectName: "manifestoBody"
+
+                        // The signed text, unchanged, for anyone who reads the
+                        // view's properties (and the headless test).
+                        Text { objectName: "manifestoBody"; visible: false; text: root.manifestoText }
+
+                        // A reading column: the same text, laid out for reading.
+                        // Only the presentation changes; the words, their order
+                        // and the bytes that are hashed and signed do not.
+                        Item {
                             width: textScroll.availableWidth
+                            implicitHeight: readingColumn.implicitHeight + 2 * Theme.spacing.large
+
+                            ColumnLayout {
+                                id: readingColumn
+                                objectName: "readingColumn"
+                                width: Math.min(parent.width - 2 * Theme.spacing.medium, 680)
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                y: Theme.spacing.large
+                                spacing: 0
+
+                                Repeater {
+                                    model: root.manifestoBlocks
+                                    delegate: Loader {
+                                        required property var modelData
+                                        required property int index
+                                        Layout.fillWidth: true
+                                        Layout.topMargin: modelData.gap
+                                        sourceComponent: modelData.kind === "title" ? titleBlock
+                                            : modelData.kind === "author" ? authorBlock
+                                            : modelData.kind === "abstract" ? abstractBlock
+                                            : modelData.kind === "keywords" ? keywordsBlock
+                                            : modelData.kind === "question" ? questionBlock
+                                            : modelData.kind === "credo" ? credoBlock
+                                            : modelData.kind === "closing" ? closingBlock
+                                            : bodyBlock
+                                        onLoaded: item.block = modelData
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Component {
+                    id: titleBlock
+                    LogosText {
+                        property var block: ({})
+                        wrapMode: Text.WordWrap
+                        textFormat: Text.PlainText
+                        text: block.text || ""
+                        font.pixelSize: Theme.typography.titleText
+                        font.weight: Theme.typography.weightBold
+                        lineHeight: 1.15
+                    }
+                }
+                Component {
+                    id: authorBlock
+                    LogosText {
+                        property var block: ({})
+                        textFormat: Text.PlainText
+                        text: "by " + (block.text || "")
+                        color: Theme.palette.textSecondary
+                        font.pixelSize: Theme.typography.subtitleText
+                    }
+                }
+                Component {
+                    id: abstractBlock
+                    Rectangle {
+                        property var block: ({})
+                        implicitHeight: abstractCol.implicitHeight + 2 * Theme.spacing.large
+                        color: Theme.palette.surfaceRecessed
+                        radius: Theme.spacing.radiusLarge
+                        Rectangle {
+                            width: 3; radius: 1.5
+                            anchors { left: parent.left; top: parent.top; bottom: parent.bottom; margins: Theme.spacing.medium }
+                            color: Theme.palette.primary
+                        }
+                        ColumnLayout {
+                            id: abstractCol
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.spacing.large; leftMargin: Theme.spacing.large + Theme.spacing.medium }
+                            spacing: Theme.spacing.small
+                            LogosText {
+                                text: "Abstract"
+                                color: Theme.palette.primary
+                                font.pixelSize: Theme.typography.secondaryText
+                                font.weight: Theme.typography.weightBold
+                                font.capitalization: Font.AllUppercase
+                                font.letterSpacing: 1
+                            }
+                            LogosText {
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                                textFormat: Text.PlainText
+                                text: block.text || ""
+                                font.pixelSize: Theme.typography.subtitleText
+                                lineHeight: 1.5
+                            }
+                        }
+                    }
+                }
+                Component {
+                    id: keywordsBlock
+                    ColumnLayout {
+                        property var block: ({})
+                        spacing: Theme.spacing.small
+                        LogosText {
+                            text: "Keywords"
+                            color: Theme.palette.textTertiary
+                            font.pixelSize: Theme.typography.secondaryText
+                            font.weight: Theme.typography.weightBold
+                            font.capitalization: Font.AllUppercase
+                            font.letterSpacing: 1
+                        }
+                        LogosText {
+                            Layout.fillWidth: true
                             wrapMode: Text.WordWrap
                             textFormat: Text.PlainText
-                            text: root.manifestoText
-                            lineHeight: 1.35
+                            text: block.text || ""
+                            color: Theme.palette.textSecondary
+                            font.pixelSize: Theme.typography.primaryText
+                            lineHeight: 1.4
                         }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.topMargin: Theme.spacing.large
+                            implicitHeight: 1
+                            color: Theme.palette.borderSecondary
+                        }
+                    }
+                }
+                Component {
+                    id: bodyBlock
+                    LogosText {
+                        property var block: ({})
+                        wrapMode: Text.WordWrap
+                        textFormat: Text.PlainText
+                        text: block.text || ""
+                        font.pixelSize: Theme.typography.subtitleText
+                        lineHeight: 1.55
+                    }
+                }
+                Component {
+                    id: questionBlock
+                    LogosText {
+                        property var block: ({})
+                        wrapMode: Text.WordWrap
+                        textFormat: Text.PlainText
+                        text: block.text || ""
+                        font.pixelSize: Theme.typography.panelTitleText - 4
+                        font.weight: Theme.typography.weightBold
+                        lineHeight: 1.3
+                    }
+                }
+                Component {
+                    id: credoBlock
+                    LogosText {
+                        property var block: ({})
+                        leftPadding: Theme.spacing.large
+                        wrapMode: Text.WordWrap
+                        textFormat: Text.PlainText
+                        text: block.text || ""
+                        font.pixelSize: Theme.typography.subtitleText + 2
+                        font.weight: Theme.typography.weightBold
+                        lineHeight: 1.4
+                        Rectangle {
+                            width: 3; radius: 1.5
+                            x: 0; y: 2; height: parent.height - 4
+                            color: Theme.palette.primary
+                        }
+                    }
+                }
+                Component {
+                    id: closingBlock
+                    LogosText {
+                        property var block: ({})
+                        wrapMode: Text.WordWrap
+                        textFormat: Text.PlainText
+                        text: block.text || ""
+                        color: Theme.palette.primary
+                        font.pixelSize: Theme.typography.panelTitleText - 4
+                        font.weight: Theme.typography.weightBold
+                        lineHeight: 1.3
                     }
                 }
 

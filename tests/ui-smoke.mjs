@@ -198,6 +198,15 @@ async function check(receipt, want) {
       if (!t.startsWith("Logos: A Declaration of Independence in Cyberspace") || !t.trim().endsWith("can experience it."))
         throw new Error(`body is ${t.length} chars`);
     });
+    await step("the reading view keeps every paragraph, in order, with nothing added", async () => {
+      const kinds = (await prop("blocksMarker", "text")).split(",");
+      const want = ["title", "author", "abstract", "keywords"];
+      if (want.some((k, i) => kinds[i] !== k)) throw new Error(`starts ${kinds.slice(0, 4)}`);
+      if (kinds[kinds.length - 1] !== "closing") throw new Error(`ends ${kinds[kinds.length - 1]}`);
+      if (!kinds.includes("question") || kinds.filter((k) => k === "credo").length < 6) throw new Error(`kinds ${kinds}`);
+      // 31 paragraphs after the title block, plus title and author.
+      if (kinds.length !== 33) throw new Error(`${kinds.length} blocks`);
+    });
     await step("statement is one line naming the hash and the date", async () => {
       const s = await prop("statementMarker", "text");
       const want = `I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace". Text sha256: ${fx.hash}. Signed on 2026-11-26.`;

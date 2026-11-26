@@ -21,7 +21,7 @@ The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad 
 
 ## Status
 
-Version 0.1.3, 26 November 2026. This version signs and verifies on one computer and exports the
+Version 0.1.4, 26 November 2026. This version signs and verifies on one computer and exports the
 receipt. There is no shared list of signers yet.
 
 | Platform | State |
@@ -47,7 +47,7 @@ The full walkthrough, including installing Basecamp itself, is in
    ```
 
 3. Install **Manifesto** from the Package Manager list. The package is signed by the publisher
-   **thehat**; the catalogue has a page at <https://roxanneen.github.io/basecamp-apps/>.
+   **thehat**, key fingerprint `6AB9 AD2D 6E8D FA6D`; the catalogue has a page at <https://roxanneen.github.io/basecamp-apps/>.
 4. Open **Manifesto** and click **Sign the manifesto**.
 
 Without the catalogue: download
@@ -173,7 +173,7 @@ python3 -m venv tests/.venv && tests/.venv/bin/pip install eth-account
 tests/.venv/bin/python tests/sig_interop.py tests/work/sig_host
 ```
 
-`tests/ui-smoke.mjs` (50 checks, each run from an empty profile) launches the standalone host headless with an isolated profile. It
+`tests/ui-smoke.mjs` (51 checks, each run from an empty profile) launches the standalone host headless with an isolated profile. It
 checks the text, hash and statement in the view; that the app made its key in an owner-only file
 and shows it nowhere; that Sign produces one receipt and signing again replaces it; and the Check a
 signature tab over the app's own receipt and over receipts made by eth-account

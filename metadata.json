@@ -1,7 +1,7 @@
 {
   "name": "manifesto_ui",
   "display_name": "Manifesto",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "ui_qml",
   "interface": "universal",
   "category": "social",
