@@ -278,7 +278,38 @@ async function check(receipt, want) {
     await step("a receipt naming another address is refused", () => check(fx.wrongAddress, "invalid"));
     await step("an edited statement is refused", () => check(fx.edited, "invalid"));
     await step("a signature over unrelated text is refused", () => check(fx.notOurs, "invalid"));
-    await step("text that is not a receipt is refused", () => check("hello", "invalid"));
+    await step("text that is not a receipt is refused, and says so", async () => {
+      await check("hello", "invalid");
+      const err = await prop("verifyErrorMarker", "text");
+      if (!err.includes("No signed line")) throw new Error(`reason shown: ${err}`);
+    });
+    // Receipts damaged in transit (the way they arrive from a chat or an email).
+    await step("a clean receipt is not reported as repaired", async () => {
+      await check(fx.valid, "valid");
+      if ((await prop("verifyRepairedMarker", "text")) !== "no") throw new Error("marked repaired");
+    });
+    for (const [name, text] of Object.entries(fx.loose.good)) {
+      await step(`damaged but genuine (${name}) verifies, as the right address`, async () => {
+        await check(text, "valid");
+        const shown = await prop("verifyAddressMarker", "text");
+        if (shown !== fx.address) throw new Error(`shown ${shown}, signer ${fx.address}`);
+        if ((await prop("verifyRepairedMarker", "text")) !== "yes") throw new Error("went through the strict path");
+      });
+    }
+    const why = {
+      wrongAddress: "not made by the address", edited: "not made by the address", badSignature: "",
+      noAddress: "no address", noAddressRandomSignature: "no address", noAddressEdited: "no address",
+      noAddressBadSignature: "no address", randomSignature: "", decoyField: "not made by the address",
+      uppercasePrefixDecoy: "not made by the address", signatureOnly: "signed line is missing", statementOnly: "signature is missing",
+    };
+    for (const [name, text] of Object.entries(fx.loose.bad)) {
+      await step(`not genuine (${name}) is refused`, async () => {
+        await check(text, "invalid");
+        const err = await prop("verifyErrorMarker", "text");
+        if (!(name in why)) throw new Error("no expected reason for this fixture");
+        if (why[name] && !err.includes(why[name])) throw new Error(`reason shown: ${err}`);
+      });
+    }
     await screenshot("04-invalid.png");
     await step("checking receipts did not add or remove any", async () => {
       if ((await prop("receiptsMarker", "text")) !== "1") throw new Error(`${await prop("receiptsMarker", "text")} receipts`);

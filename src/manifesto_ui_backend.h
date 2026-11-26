@@ -50,6 +50,9 @@ public:
     static bool parseStatement(const QString& statement, QString& title, QString& hashHex, QString& isoDate);
     // The whole check of one receipt object, against `currentHash`.
     static QJsonObject checkReceipt(const QJsonObject& receipt, const QString& currentHash);
+    // Finds the statement, address and signature in text that is no longer
+    // clean JSON (see the .cpp). Empty when they are not there.
+    static QJsonObject receiptFromLooseText(const QString& text);
 
 private:
     // ---- manifesto ---------------------------------------------------------

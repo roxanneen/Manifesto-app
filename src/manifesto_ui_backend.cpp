@@ -770,6 +770,101 @@ void ManifestoUiBackend::cancelSign()
 // ---------------------------------------------------------------------------
 // Verify
 
+// A receipt that travelled through a chat app or an email often arrives
+// damaged in ways that have nothing to do with the signature: the backslashes
+// before the quotes inside the statement are dropped (so it is no longer JSON),
+// straight quotes become curly ones, long lines get wrapped or split, invisible
+// characters are inserted. The three things that matter survive all of that:
+// the statement line, the address and the signature. This finds them in any
+// text.
+//
+// It cannot make a bad signature pass. It only ever returns an address that
+// is written in the text, never one worked out from the signature (every
+// signature "recovers" to some address, so that would prove nothing), and
+// whatever it returns still goes through checkReceipt, where the signature
+// must recover to that address over that exact statement.
+//
+// On failure the result has only "missing": statement | signature | both | address.
+QJsonObject ManifestoUiBackend::receiptFromLooseText(const QString& textIn)
+{
+    QString t = textIn;
+    // Invisible characters chat apps insert: soft hyphen, zero-width and
+    // direction marks, word joiner, byte-order mark.
+    static const QRegularExpression invisible(QStringLiteral(
+        "[\\x{00AD}\\x{200B}-\\x{200F}\\x{202A}-\\x{202E}\\x{2060}\\x{FEFF}]"));
+    t.remove(invisible);
+    // Email quoting at the start of lines.
+    static const QRegularExpression quoteMarks(QStringLiteral("(^|\\n)[ \\t]*(?:>[ \\t]*)+"));
+    t.replace(quoteMarks, QStringLiteral("\\1"));
+    // Undo what escaping and "smart" typography do to the quotes in the statement.
+    static const QRegularExpression escapedQuote(QStringLiteral("\\\\+\""));
+    t.replace(escapedQuote, QStringLiteral("\""));
+    t.replace(QStringLiteral("&quot;"), QStringLiteral("\""));
+    t.replace(QStringLiteral("&#34;"), QStringLiteral("\""));
+    for (const QChar c : {QChar(0x201C), QChar(0x201D), QChar(0x201E), QChar(0x201F), QChar(0x00AB), QChar(0x00BB)})
+        t.replace(c, QLatin1Char('"'));
+    t.replace(QChar(0x00A0), QLatin1Char(' '));
+    // Wrapped lines: the statement has single spaces only.
+    t = t.simplified();
+
+    static const QRegularExpression stRe(QStringLiteral(
+        "I sign the Logos manifesto, \"[^\"]{1,200}\"\\. Text sha256: [0-9a-f]{64}\\. Signed on \\d{4}-\\d{2}-\\d{2}\\."));
+    // A signature may have been split by a space or a line break.
+    static const QRegularExpression sigRe(QStringLiteral(
+        "(?<![0-9a-fA-F])0[xX](?:[0-9a-fA-F] ?){130}(?![0-9a-fA-F])"));
+    static const QRegularExpression addrRe(QStringLiteral(
+        "(?<![0-9a-fA-F])0[xX][0-9a-fA-F]{40}(?![0-9a-fA-F])"));
+
+    const QRegularExpressionMatch st = stRe.match(t);
+    const QRegularExpressionMatch sg = sigRe.match(t);
+    QJsonObject out;
+    if (!st.hasMatch() || !sg.hasMatch()) {
+        out.insert(QStringLiteral("missing"),
+                   !st.hasMatch() && !sg.hasMatch() ? QStringLiteral("both")
+                       : (!st.hasMatch() ? QStringLiteral("statement") : QStringLiteral("signature")));
+        return out;
+    }
+    const QString statement = st.captured(0);
+    QString signature = sg.captured(0);
+    signature.remove(QLatin1Char(' '));
+    signature = QStringLiteral("0x") + signature.mid(2).toLower();
+
+    // Addresses written in the text, outside the signature itself. If one of
+    // them is the signer's, that is the receipt's address; otherwise the first
+    // one is taken, and the check will say the signature is not from it.
+    QString rest = t;
+    rest.remove(sg.capturedStart(0), sg.capturedLength(0));
+    sig::Address signer;
+    std::string err;
+    const bool recovered = sig::recoverSigner(statement.toStdString(), signature.toStdString(), signer, err);
+    QString address;
+    QRegularExpressionMatchIterator it = addrRe.globalMatch(rest);
+    while (it.hasNext()) {
+        const QString candidate = it.next().captured(0);
+        sig::Address parsed;
+        if (!sig::parseAddress(candidate.toStdString(), parsed))
+            continue;
+        if (address.isEmpty())
+            address = candidate;
+        if (recovered && parsed == signer) {
+            address = candidate;
+            break;
+        }
+    }
+    if (address.isEmpty()) {
+        out.insert(QStringLiteral("missing"), QStringLiteral("address"));
+        return out;
+    }
+
+    out.insert(QStringLiteral("type"), kReceiptType);
+    out.insert(QStringLiteral("version"), kReceiptVersion);
+    out.insert(QStringLiteral("scheme"), QStringLiteral("eip191"));
+    out.insert(QStringLiteral("statement"), statement);
+    out.insert(QStringLiteral("address"), address);
+    out.insert(QStringLiteral("signature"), signature);
+    return out;
+}
+
 void ManifestoUiBackend::verifyReceipt(QString receiptJson)
 {
     QJsonObject out;
@@ -778,19 +873,53 @@ void ManifestoUiBackend::verifyReceipt(QString receiptJson)
         setVerifyResultJson(QStringLiteral("{}"));
         return;
     }
-    if (bytes.size() > kMaxReceiptBytes) {
+    auto refuse = [&out](const QString& why) {
+        out = QJsonObject();
         out.insert(QStringLiteral("checked"), true);
         out.insert(QStringLiteral("valid"), false);
-        out.insert(QStringLiteral("error"), QStringLiteral("That is too long to be a receipt."));
+        out.insert(QStringLiteral("sameText"), false);
+        out.insert(QStringLiteral("error"), why);
+    };
+    if (bytes.size() > kMaxReceiptBytes) {
+        refuse(QStringLiteral("That is too long to be a receipt."));
     } else {
         QJsonParseError pe;
         const QJsonDocument doc = QJsonDocument::fromJson(bytes, &pe);
-        if (pe.error != QJsonParseError::NoError || !doc.isObject()) {
-            out.insert(QStringLiteral("checked"), true);
-            out.insert(QStringLiteral("valid"), false);
-            out.insert(QStringLiteral("error"), QStringLiteral("That is not a receipt. Paste the whole text, from { to }."));
-        } else {
+        const bool strict = pe.error == QJsonParseError::NoError && doc.isObject();
+        if (strict)
             out = checkReceipt(doc.object(), manifestoHash());
+
+        // Not clean JSON, or clean JSON whose text was altered on the way
+        // (curly quotes inside the statement, say): look for the statement,
+        // address and signature in the text itself.
+        if (!strict || !out.value(QStringLiteral("valid")).toBool()) {
+            const QJsonObject loose = receiptFromLooseText(receiptJson);
+            const QString missing = loose.value(QStringLiteral("missing")).toString();
+            if (missing.isEmpty()) {
+                QJsonObject res = checkReceipt(loose, manifestoHash());
+                res.insert(QStringLiteral("repaired"), true);
+                if (!strict) {
+                    out = res;
+                } else if (res.value(QStringLiteral("valid")).toBool()) {
+                    // A well-formed receipt names its address in a field of
+                    // its own. The repaired reading may replace its verdict
+                    // only when it is about that same address.
+                    sig::Address named, found;
+                    if (sig::parseAddress(doc.object().value(QStringLiteral("address")).toString().toStdString(), named)
+                        && sig::parseAddress(loose.value(QStringLiteral("address")).toString().toStdString(), found)
+                        && named == found)
+                        out = res;
+                }
+            } else if (!strict) {
+                if (missing == QLatin1String("address"))
+                    refuse(QStringLiteral("The signed line and a signature were found, but no address. A signature can only be checked against the address it claims to come from. Paste the whole receipt, including the address."));
+                else if (missing == QLatin1String("signature"))
+                    refuse(QStringLiteral("The signed line was found, but the signature is missing or cut short. It should be 0x followed by 130 letters and digits. Ask the sender to send the receipt again."));
+                else if (missing == QLatin1String("statement"))
+                    refuse(QStringLiteral("A signature was found, but the signed line is missing or was changed on the way. Ask the sender to send the receipt again."));
+                else
+                    refuse(QStringLiteral("No signed line and no signature were found in that text. Paste the whole receipt."));
+            }
         }
     }
     setVerifyResultJson(QString::fromUtf8(QJsonDocument(out).toJson(QJsonDocument::Compact)));

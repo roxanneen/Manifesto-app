@@ -41,6 +41,8 @@ Item {
     readonly property var receipts: parse(ready && backend && backend.receiptsJson ? backend.receiptsJson : "[]", [])
     readonly property var verifyResult: parse(ready && backend && backend.verifyResultJson ? backend.verifyResultJson : "{}", ({}))
 
+    readonly property string repairedNote: verifyResult.repaired === true && verifyResult.valid === true
+        ? " The receipt's formatting was damaged on the way. The signed line, the address and the signature were read from the text, and the signature matches that address." : ""
     readonly property bool busy: signState === "requesting" || signState === "awaiting" || signState === "signing"
     // The choice is kept by address: the account list is re-read after every
     // signature and refresh, which would otherwise reset the box to its first row.
@@ -132,6 +134,8 @@ Item {
     Text { objectName: "accountsMarker"; visible: false; text: String(root.accounts.length) }
     Text { objectName: "ownAddressMarker"; visible: false; text: root.ready && root.backend && root.backend.appKeyAddress ? root.backend.appKeyAddress : "" }
     Text { objectName: "receiptsMarker"; visible: false; text: String(root.receipts.length) }
+    Text { objectName: "verifyErrorMarker"; visible: false; text: root.verifyResult.error || "" }
+    Text { objectName: "verifyRepairedMarker"; visible: false; text: root.verifyResult.repaired === true ? "yes" : "no" }
     Text { objectName: "verifyAddressMarker"; visible: false; text: root.verifyResult.address || "" }
     Text {
         objectName: "verifyMarker"; visible: false
@@ -492,7 +496,7 @@ Item {
                         wrapMode: Text.WordWrap
                         color: Theme.palette.textSecondary
                         font.pixelSize: Theme.typography.secondaryText
-                        text: "Paste a receipt. The check runs on this computer: it works out which account made the signature and compares the text it names with the manifesto in this app."
+                        text: "Paste a receipt someone sent you, or one of your own. The check runs on this computer: it works out which key made the signature and compares the text it names with the manifesto in this app. A receipt that lost some punctuation on the way, in a chat or an email, still works, as long as it still holds the signed line, the address and the signature."
                     }
                     LogosTextArea {
                         id: verifyArea
@@ -533,9 +537,10 @@ Item {
                         message: !root.verifyResult.valid ? (root.verifyResult.error || "")
                                  : (root.verifyResult.sameText
                                     ? "Signed by " + root.verifyResult.address + " on " + root.verifyResult.date + ". The date is the signer's own statement."
+                                      + root.repairedNote
                                     : "Signed by " + root.verifyResult.address + " on " + root.verifyResult.date
                                       + ", over a text with sha256 " + root.verifyResult.hash
-                                      + ". The manifesto in this app has " + root.manifestoHash + ".")
+                                      + ". The manifesto in this app has " + root.manifestoHash + "." + root.repairedNote)
                     }
                     LogosText {
                         Layout.fillWidth: true

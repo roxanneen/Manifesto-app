@@ -21,7 +21,7 @@ The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad 
 
 ## Status
 
-Version 0.1.1, 26 November 2026. This version signs and verifies on one computer and exports the
+Version 0.1.2, 26 November 2026. This version signs and verifies on one computer and exports the
 receipt. There is no shared list of signers yet.
 
 | Platform | State |
@@ -134,6 +134,14 @@ The signature is an Ethereum personal message signature (EIP-191), 65 bytes `râ€
 The app's Check a signature tab does the same three steps on the local machine
 (`src/sigcheck.cpp`: Keccak-256, public key recovery through libsecp256k1, EIP-55 addresses).
 
+Receipts often arrive damaged when sent through a chat app or an email: the backslashes before the
+quotes in the statement are dropped (so it is no longer valid JSON), quotes turn curly, lines wrap.
+The checker therefore also accepts any text that still holds the statement, the address and the
+signature, and says when it read a receipt that way. This does not loosen the check: the signature
+must still recover to an address that is written in the text, over that exact statement. Text with
+no address is refused, because every signature recovers to some address and that alone proves
+nothing.
+
 What a valid receipt shows: the holder of that account's key approved that exact line. What it does
 not show: who the holder is, or that one person signed once. A person can sign from many accounts.
 
@@ -167,12 +175,13 @@ python3 -m venv tests/.venv && tests/.venv/bin/pip install eth-account
 tests/.venv/bin/python tests/sig_interop.py tests/work/sig_host
 ```
 
-`tests/ui-smoke.mjs` (26 checks, each run from an empty profile) launches the standalone host headless with an isolated profile. It
+`tests/ui-smoke.mjs` (50 checks, each run from an empty profile) launches the standalone host headless with an isolated profile. It
 checks the text, hash and statement in the view; that the app made its key in an owner-only file
 and shows it nowhere; that Sign produces one receipt and signing again replaces it; and the Check a
 signature tab over the app's own receipt and over receipts made by eth-account
 (`tests/make_fixtures.py`): valid, another text version, wrong address, edited statement, unrelated
-text. It then restarts the app three times: the key and receipt survive a restart, a damaged key file
+text. It also checks eleven kinds of transit damage that must still verify and twelve altered or
+incomplete receipts that must be refused. It then restarts the app three times: the key and receipt survive a restart, a damaged key file
 is left untouched with signing off and the receipt still listed, and restoring the file restores the
 address. `tests/check_receipt.py` then verifies the receipt the app produced with eth-account.
 

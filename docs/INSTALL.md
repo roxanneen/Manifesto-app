@@ -121,6 +121,9 @@ Your signature is stored as a small piece of text called a receipt. To see it, o
 name starts with **Your signatures**. To share it with someone, click **Copy receipt** and paste it
 wherever you like. Nothing is sent anywhere unless you share it yourself.
 
+To check a receipt someone sent you, open the **Check a signature** tab, paste the receipt and click
+**Check**. A green box means the signature is genuine and is for the same text you see in the app.
+
 ## What happens on your computer
 
 - The first time it opens, the app creates a signing key for you. A signing key is a secret number
