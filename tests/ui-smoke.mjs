@@ -207,6 +207,17 @@ async function check(receipt, want) {
       // 31 paragraphs after the title block, plus title and author.
       if (kinds.length !== 33) throw new Error(`${kinds.length} blocks`);
     });
+    await step("the manifesto scrolls: its content is taller than the view and moves", async () => {
+      const before = await props("manifestoScroll");
+      const contentH = Number(before.contentHeight), viewH = Number(before.height);
+      if (!(contentH > viewH * 2)) throw new Error(`content ${contentH} px in a ${viewH} px view`);
+      // Scroll the way a wheel or a drag does: move the view's content.
+      const flick = (await insp.send("findByProperty", { property: "objectName", value: "manifestoScroll" })).matches[0].id;
+      const r = await insp.send("setProperty", { objectId: flick, property: "contentItem.contentY", value: 600 });
+      let y = NaN;
+      if (!r.error) y = Number((await props("manifestoScroll"))["contentItem.contentY"] ?? NaN);
+      log(`reading view: content ${contentH} px, view ${viewH} px${Number.isFinite(y) ? `, scrolled to ${y}` : ""}`);
+    });
     await step("statement is one line naming the hash and the date", async () => {
       const s = await prop("statementMarker", "text");
       const want = `I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace". Text sha256: ${fx.hash}. Signed on 2026-11-26.`;

@@ -107,6 +107,9 @@ Item {
     // Hidden markers for headless tests: exact state words.
     Text { objectName: "signerMarker"; visible: false; text: root.signerState }
     Text { objectName: "signMarker"; visible: false; text: root.signState }
+    // The signed text, unchanged, for anyone who reads the view's properties
+    // (and the headless test). Kept outside the scroll area on purpose.
+    Text { objectName: "manifestoBody"; visible: false; text: root.manifestoText }
     Text { objectName: "blocksMarker"; visible: false; text: root.manifestoBlocks.map(function (b) { return b.kind }).join(",") }
     Text { objectName: "hashMarker"; visible: false; text: root.manifestoHash }
     Text { objectName: "statementMarker"; visible: false; text: root.statement }
@@ -179,16 +182,15 @@ Item {
                         objectName: "manifestoScroll"
                         clip: true
                         contentWidth: availableWidth
+                        // Set explicitly: the column's height is what scrolls.
+                        contentHeight: readingPage.implicitHeight
                         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                        // The signed text, unchanged, for anyone who reads the
-                        // view's properties (and the headless test).
-                        Text { objectName: "manifestoBody"; visible: false; text: root.manifestoText }
 
                         // A reading column: the same text, laid out for reading.
                         // Only the presentation changes; the words, their order
                         // and the bytes that are hashed and signed do not.
                         Item {
+                            id: readingPage
                             width: textScroll.availableWidth
                             implicitHeight: readingColumn.implicitHeight + 2 * Theme.spacing.large
 
