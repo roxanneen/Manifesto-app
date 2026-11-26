@@ -17,7 +17,9 @@ only: not on Windows, Intel Macs, phones or tablets.
 The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad Hope. Source:
 <https://logos.co/manifesto>. See [NOTICE.md](NOTICE.md).
 
-![The Manifesto app](docs/screenshot.png)
+![The Manifesto app on a fresh install: the manifesto and the line you sign](docs/screenshot.png)
+
+![The end of the manifesto, with "Hack the planet!"](docs/screenshot-ending.png)
 
 ## Status
 
