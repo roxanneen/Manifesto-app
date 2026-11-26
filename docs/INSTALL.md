@@ -96,9 +96,9 @@ You need Basecamp version 0.3.2 or newer. The link above always gives you the ne
 3. A file window opens. Go to your Downloads folder and click the file whose name starts with
    `manifesto_ui-` and ends in `.lgx`. Then click **Open**.
 4. A box titled **Install Package?** appears. It says the package is unsigned. That is expected for
-   this app, and it has nothing to do with your own signature on the manifesto. If the box lists
-   optional packages, leave them unticked, because the Manifesto app does not need anything else.
-   Click the button that confirms the install. Nothing is installed until you do.
+   this app, and it has nothing to do with your own signature on the manifesto. The Manifesto app
+   needs no other packages. Click the button that confirms the install. Nothing is installed until
+   you do.
 5. Wait a few seconds for the install to finish.
 6. **Manifesto** now appears among your apps in Basecamp. Look for it in the same side bar or in the
    list of applications, and click it to open it.
@@ -184,8 +184,8 @@ Facts you need:
   Files: manifesto_ui-darwin-arm64.lgx, manifesto_ui-linux-x86_64.lgx, manifesto_ui-linux-aarch64.lgx
   Ignore the .sha256 files and the Source code files.
 - In Basecamp: Package Manager, then Install Local Package, then choose the .lgx file, then
-  confirm the "Install Package?" box. It says the package is unsigned; that is expected. Leave any
-  optional packages unticked.
+  confirm the "Install Package?" box. It says the package is unsigned; that is expected. The app
+  needs no other packages.
 - Then open the Manifesto app and click "Sign the manifesto". A green box confirms it.
 - The Manifesto app and Basecamp never need an account, a wallet, a payment or a password. The one
   exception is my own computer asking for my computer password to allow a newly downloaded app to

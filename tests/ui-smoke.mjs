@@ -9,7 +9,7 @@
 // against receipts made by an independent implementation
 // (tests/make_fixtures.py). The signed receipt is written to
 // WORK/signed-receipt.json so tests/check_receipt.py can verify it with
-// eth-account. Signing through the Signer app is not covered: it needs a person.
+// eth-account.
 //
 //   MANIFESTO_RUN=./result-ui-dev/bin/run-logos-standalone-ui \
 //   MANIFESTO_WORK=$PWD/tests/work/smoke MANIFESTO_FIXTURES=$PWD/tests/work/fixtures.json \
@@ -218,6 +218,8 @@ async function check(receipt, want) {
     await screenshot("01-read-and-sign.png");
     await step("no receipt exists before signing", async () => {
       if ((await prop("receiptsMarker", "text")) !== "0") throw new Error("a receipt exists");
+      if ((await rootProp("ownSigned")) !== false || (await prop("signButton", "text")) !== "Sign the manifesto")
+        throw new Error("marked as signed before signing");
     });
     await step("Sign makes a receipt in one click", async () => {
       await waitFor(async () => (await prop("signButton", "enabled")) === true, 5000, "sign enabled");
@@ -227,6 +229,7 @@ async function check(receipt, want) {
         await waitFor(async () => { last = await prop("signMarker", "text"); return last === "signed"; }, 10000, "signed");
       } catch (e) { throw new Error(`${e.message}; signMarker is "${last}": ${await rootProp("signInfo")}`); }
       await waitFor(async () => (await prop("receiptsMarker", "text")) === "1", 5000, "one receipt");
+      await waitFor(async () => (await rootProp("ownSigned")) === true && (await prop("signButton", "text")) === "Sign again", 5000, "button says Sign again");
     });
     let saved = null;
     await step("the saved receipt names the own key and today's statement", async () => {
@@ -324,6 +327,7 @@ async function check(receipt, want) {
       if (again !== ownAddress) throw new Error(`address changed to ${again}`);
       if (!fs.readFileSync(keyFile).equals(keyBytes)) throw new Error("key file changed");
       await waitFor(async () => (await prop("receiptsMarker", "text")) === "1", 5000, "one receipt");
+      await waitFor(async () => (await rootProp("ownSigned")) === true, 5000, "still marked as signed");
     });
     const damaged = Buffer.from("this is not a key\n");
     await step("a damaged key file is left untouched and signing switches off", async () => {

@@ -1,7 +1,7 @@
 {
   "name": "manifesto_ui",
   "display_name": "Manifesto",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "ui_qml",
   "interface": "universal",
   "category": "social",
@@ -10,12 +10,6 @@
   "icon": "icons/manifesto.png",
   "view": "qml/Main.qml",
   "dependencies": [],
-  "optional_dependencies": [
-    { "name": "signer_manager_module", "version": "~0.2.0" }
-  ],
-  "uses": [
-    { "intent": "evm.signing.approve" }
-  ],
   "codegen": { "rep": "src/manifesto_ui.rep" },
 
   "nix": {

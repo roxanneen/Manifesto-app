@@ -21,7 +21,7 @@ The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad 
 
 ## Status
 
-Version 0.1.2, 26 November 2026. This version signs and verifies on one computer and exports the
+Version 0.1.3, 26 November 2026. This version signs and verifies on one computer and exports the
 receipt. There is no shared list of signers yet.
 
 | Platform | State |
@@ -31,9 +31,7 @@ receipt. There is no shared list of signers yet.
 | Intel Macs, phones, tablets | Not supported. Basecamp itself has no build for them |
 | Windows | Not supported. The Windows code paths have never been compiled |
 
-Signing with the app's own key is tested end to end (see Tests). Signing with an account from the
-Signer app is implemented but has not been exercised, because approving a request there needs a
-person.
+Signing and checking are tested end to end (see Tests).
 
 ## Install
 
@@ -55,9 +53,8 @@ The full walkthrough, including installing Basecamp itself, is in
    confirm the **Install Package?** box.
 4. Open **Manifesto** and click **Sign the manifesto**.
 
-The package is not signed; each one ships with a `.sha256` file to compare against. The app needs no
-other module. If `signer_manager_module` happens to be installed, its accounts are offered as an
-extra way to sign.
+The package is not signed; each one ships with a `.sha256` file to compare against. The app depends
+on no other module.
 
 ## What is signed
 
@@ -70,9 +67,7 @@ I sign the Logos manifesto, "Logos: A Declaration of Independence in Cyberspace"
 - The hash is the sha256 of `src/manifesto.txt`, byte for byte. That file is baked into the build,
   so the file is the version being signed. Changing one character changes the hash.
 - The date is the signer's own statement (UTC). Nothing timestamps it independently.
-- The line is plain printable text on one line. The app shows it above the Sign button. When a
-  Signer account is used, the Signer shows exactly this line before the person approves, and it
-  refuses control characters.
+- The line is plain printable text on one line. The app shows it above the Sign button.
 
 `src/manifesto.txt` is the manifesto by Jarrad Hope, taken from its source,
 <https://logos.co/manifesto>, on 26 November 2026 and checked
@@ -86,7 +81,7 @@ and every new signature follow it.
 
 ## How a signature is made
 
-**With the app's own key (the default).** On first run the backend takes 32 random bytes from the
+On first run the backend takes 32 random bytes from the
 operating system, checks they form a usable secp256k1 key, and writes them as hex to
 `module_data/manifesto_ui/signing-key` in the Basecamp profile. The file is created owner-only and is
 never overwritten: if it cannot be read later, signing switches off and the file is left alone. The
@@ -97,18 +92,6 @@ stranger would run, and saves the receipt.
 Back up that file to keep the same signing address on another computer or after a reinstall. Anyone
 who can read it can sign the statement as that address, and nothing else: the key is used for
 nothing but this.
-
-**With an account from the Signer (optional).** `signer_manager_module` is an optional dependency.
-The app loads and signs without it. If it is installed and lists accounts, they appear in a "Sign
-with" box next to the app's key.
-
-1. The backend calls `request_approval` with `{ address, purpose, legs: [{ kind: "message", text }] }`.
-   That returns at once with a handle and a one-time token.
-2. The view raises the `evm.signing.approve` intent with the handle, so the Signer app comes forward
-   showing the line. The person approves with their wallet password, device or PIN.
-3. The backend polls `approval_status`, then `fetch_result`, then `ack_result`.
-4. The signature must recover to the chosen account over the statement this module built, or it is
-   discarded.
 
 ## The receipt and how to verify it
 
@@ -142,13 +125,12 @@ must still recover to an address that is written in the text, over that exact st
 no address is refused, because every signature recovers to some address and that alone proves
 nothing.
 
-What a valid receipt shows: the holder of that account's key approved that exact line. What it does
-not show: who the holder is, or that one person signed once. A person can sign from many accounts.
+What a valid receipt shows: whoever holds the key for that address signed that exact line. What it
+does not show: who the holder is, or that one person signed once. A person can sign with several keys.
 
 Receipts are kept in `module_data/manifesto_ui/receipts/` in the Basecamp profile and go nowhere
-until the person copies one out. A receipt from the app's own key points to no other activity,
-because that key does nothing else. A receipt from a Signer account links that account to the
-manifesto.
+until the person copies one out. A receipt points to no other activity of the person's, because
+the key does nothing else.
 
 ## Build
 
@@ -203,6 +185,8 @@ Environment hook used by tests only: `MANIFESTO_DATE` pins the date in the state
   `delivery_module`, have every copy of the app verify each one before counting it, and publish
   snapshots of the list to Logos Storage.
 - One signature per person. A key costs nothing to make, so a count of receipts is a count of keys.
+- Signing with an existing wallet account or a hardware key. An earlier build could use accounts
+  from Basecamp's Signer app; that was removed so the app depends on nothing else.
 - A password or hardware protection for the app's own key, and a way to export or replace it from
   the view.
 

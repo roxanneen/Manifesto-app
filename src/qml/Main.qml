@@ -8,9 +8,8 @@ import Logos.Controls
 // Manifesto view. Runs inside Basecamp; the backend runs in the module's
 // ui-host process and is reached through the typed replica logos.module().
 // Three surfaces: read and sign, your signatures, check a signature.
-// By default the backend signs with a key the app made for itself, so no
-// account is needed. If the Signer lists accounts, one of those can be picked
-// instead and the signature is then approved in the Signer app.
+// The backend signs with a key the app made for itself on first run, so no
+// account and no other app is needed.
 Item {
     id: root
     objectName: "manifestoRoot"
@@ -29,7 +28,6 @@ Item {
     readonly property string signerInfo: ready && backend && backend.signerInfo ? backend.signerInfo : ""
     readonly property string signState: ready && backend && backend.signState ? backend.signState : "idle"
     readonly property string signInfo: ready && backend && backend.signInfo ? backend.signInfo : ""
-    readonly property string pendingHandle: ready && backend && backend.pendingHandle ? backend.pendingHandle : ""
     readonly property string appKeyFile: ready && backend && backend.appKeyFile ? backend.appKeyFile : ""
     readonly property string buildId: ready && backend && backend.buildId ? backend.buildId : ""
 
@@ -37,42 +35,14 @@ Item {
         try { var v = JSON.parse(text); return v === null || v === undefined ? fallback : v }
         catch (e) { return fallback }
     }
-    readonly property var accounts: parse(ready && backend && backend.accountsJson ? backend.accountsJson : "[]", [])
     readonly property var receipts: parse(ready && backend && backend.receiptsJson ? backend.receiptsJson : "[]", [])
     readonly property var verifyResult: parse(ready && backend && backend.verifyResultJson ? backend.verifyResultJson : "{}", ({}))
 
     readonly property string repairedNote: verifyResult.repaired === true && verifyResult.valid === true
         ? " The receipt's formatting was damaged on the way. The signed line, the address and the signature were read from the text, and the signature matches that address." : ""
-    readonly property bool busy: signState === "requesting" || signState === "awaiting" || signState === "signing"
-    // The choice is kept by address: the account list is re-read after every
-    // signature and refresh, which would otherwise reset the box to its first row.
-    property string chosenAddress: ""
-    readonly property var chosen: {
-        for (var i = 0; i < accounts.length; i++)
-            if (accounts[i].address === chosenAddress) return accounts[i]
-        return accounts.length > 0 ? accounts[0] : null
-    }
-    // If the chosen address leaves the list, fall back openly to the first row
-    // (and say so through the text under the statement) instead of keeping a
-    // stale choice.
-    onAccountsChanged: {
-        for (var i = 0; i < accounts.length; i++)
-            if (accounts[i].address === chosenAddress) return
-        chosenAddress = accounts.length > 0 ? accounts[0].address : ""
-    }
+    readonly property bool ownSigned: ready && backend && backend.ownSigned === true
     readonly property string unsavedReceipt: ready && backend && backend.unsavedReceiptJson ? backend.unsavedReceiptJson : ""
-    readonly property bool canRaiseIntents: typeof logos !== "undefined" && !!logos && typeof logos.request === "function"
 
-    // --- local UI state ---
-    property string signerNote: ""
-    property string raisedFor: ""
-
-    function shortAddress(a) { return a && a.length > 14 ? a.slice(0, 8) + "…" + a.slice(-6) : (a || "") }
-    function accountLabel(a) {
-        var name = a.own ? "This app's key  " : (a.label ? a.label + "  " : "Signer account  ")
-        return name + shortAddress(a.address) + (a.signed ? "  (signed)" : "")
-    }
-    readonly property bool ownChosen: chosen !== null && chosen.own === true
     function signerColour(st) {
         if (st === "ready") return Theme.palette.success
         if (st === "checking") return Theme.palette.warning
@@ -82,32 +52,6 @@ Item {
         if (st === "ready") return "ready to sign"
         if (st === "checking") return "starting"
         return "signing is off"
-    }
-
-    // Bring the Signer forward on the request that is waiting. The answer is
-    // advisory: the request's real state comes from the backend's poll.
-    function openSigner(handle) {
-        if (!handle) return
-        if (!root.canRaiseIntents) {
-            root.signerNote = "Open the Signer app and approve the request there."
-            return
-        }
-        logos.request("evm.signing.approve", { handle: handle }, function (res) {
-            var e = String((res && res.error) || "")
-            if (e === "unavailable" || e === "cancelled")
-                root.signerNote = "The Signer app did not open. Install or open it from the sidebar, then approve the request there."
-            else if (e !== "")
-                root.signerNote = "The Signer could not be opened (" + e + "). Open it from the sidebar and approve the request there."
-            else
-                root.signerNote = ""
-        })
-    }
-    onPendingHandleChanged: {
-        if (pendingHandle !== "" && pendingHandle !== raisedFor) {
-            raisedFor = pendingHandle
-            openSigner(pendingHandle)
-        }
-        if (pendingHandle === "") { raisedFor = ""; signerNote = "" }
     }
 
     Connections {
@@ -131,7 +75,6 @@ Item {
     Text { objectName: "signMarker"; visible: false; text: root.signState }
     Text { objectName: "hashMarker"; visible: false; text: root.manifestoHash }
     Text { objectName: "statementMarker"; visible: false; text: root.statement }
-    Text { objectName: "accountsMarker"; visible: false; text: String(root.accounts.length) }
     Text { objectName: "ownAddressMarker"; visible: false; text: root.ready && root.backend && root.backend.appKeyAddress ? root.backend.appKeyAddress : "" }
     Text { objectName: "receiptsMarker"; visible: false; text: String(root.receipts.length) }
     Text { objectName: "verifyErrorMarker"; visible: false; text: root.verifyResult.error || "" }
@@ -168,13 +111,6 @@ Item {
                 text: root.signerInfo
                 color: Theme.palette.textTertiary
                 font.pixelSize: Theme.typography.secondaryText
-            }
-            LogosButton {
-                objectName: "refreshButton"
-                text: "Refresh"
-                compact: true
-                enabled: root.ready
-                onClicked: root.backend.refreshAccounts()
             }
         }
 
@@ -263,62 +199,21 @@ Item {
                             wrapMode: Text.WordWrap
                             color: Theme.palette.textTertiary
                             font.pixelSize: Theme.typography.secondaryText
-                            visible: root.chosen !== null
-                            text: root.chosen === null ? "" : root.ownChosen
-                                  ? "The signature is made on this computer with a key this app created for you. The key is used for nothing else, so a receipt points to no other activity of yours. It has no password and is kept in one file: " + root.appKeyFile
-                                  : "This is an account from the Signer. The Signer app will show the same line and ask you to approve it. Anyone who sees your receipt can link this account to the manifesto."
+                            visible: root.signerState === "ready"
+                            text: "The signature is made on this computer with a key this app created for you. The key is used for nothing else, so a receipt points to no other activity of yours. It has no password and is kept in one file: " + root.appKeyFile
                         }
 
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: Theme.spacing.medium
-                            LogosText {
-                                visible: root.accounts.length > 1
-                                text: "Sign with"
-                                color: Theme.palette.textSecondary
-                                font.pixelSize: Theme.typography.secondaryText
-                            }
-                            LogosComboBox {
-                                id: accountBox
-                                objectName: "accountBox"
-                                Layout.preferredWidth: 340
-                                // With only the app's own key there is nothing to choose.
-                                visible: root.accounts.length > 1
-                                enabled: !root.busy
-                                model: root.accounts.map(root.accountLabel)
-                                onActivated: function (i) {
-                                    if (i >= 0 && i < root.accounts.length) root.chosenAddress = root.accounts[i].address
-                                }
-                                onModelChanged: {
-                                    var at = -1
-                                    for (var i = 0; i < root.accounts.length; i++)
-                                        if (root.accounts[i].address === root.chosenAddress) at = i
-                                    currentIndex = at >= 0 ? at : (root.accounts.length > 0 ? 0 : -1)
-                                }
-                            }
                             Item { Layout.fillWidth: true }
-                            LogosButton {
-                                objectName: "cancelButton"
-                                visible: root.busy
-                                text: "Cancel"
-                                compact: true
-                                onClicked: root.backend.cancelSign()
-                            }
-                            LogosButton {
-                                objectName: "openSignerButton"
-                                visible: root.signState === "awaiting"
-                                text: "Open the Signer"
-                                compact: true
-                                onClicked: root.openSigner(root.pendingHandle)
-                            }
                             LogosButton {
                                 objectName: "signButton"
                                 // The screen's one main action.
                                 variant: LogosButton.Variant.Primary
-                                text: root.busy ? "Waiting for the Signer…"
-                                      : (root.chosen && root.chosen.signed ? "Sign again" : "Sign the manifesto")
-                                enabled: root.ready && !root.busy && root.chosen !== null && root.chosen.available !== false
-                                onClicked: root.backend.sign(root.chosen.address)
+                                text: root.ownSigned ? "Sign again" : "Sign the manifesto"
+                                enabled: root.ready && root.signerState === "ready"
+                                onClicked: root.backend.sign()
                             }
                         }
 
@@ -333,17 +228,12 @@ Item {
                         LogosNotice {
                             objectName: "signNotice"
                             Layout.fillWidth: true
-                            visible: root.signState !== "idle" && root.signState !== "requesting"
-                            severity: root.signState === "signed" ? LogosNotice.Success
-                                      : (root.signState === "error" ? LogosNotice.Error
-                                         : (root.signState === "rejected" ? LogosNotice.Warning : LogosNotice.Info))
-                            title: root.signState === "signed" ? "You signed the manifesto"
-                                   : (root.signState === "awaiting" ? "Approve it in the Signer"
-                                      : (root.signState === "signing" ? "Signing…"
-                                         : (root.signState === "rejected" ? "Not signed" : "Something went wrong")))
+                            visible: root.signState === "signed" || root.signState === "error"
+                            severity: root.signState === "signed" ? LogosNotice.Success : LogosNotice.Error
+                            title: root.signState === "signed" ? "You signed the manifesto" : "Something went wrong"
                             message: root.signState === "signed"
                                      ? "The signature was checked against the signing address. Your receipt is under Your signatures."
-                                     : (root.signerNote !== "" && root.signState === "awaiting" ? root.signerNote : root.signInfo)
+                                     : root.signInfo
                             actions: [
                                 LogosButton {
                                     text: "See the receipt"
