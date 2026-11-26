@@ -211,18 +211,17 @@ Facts you need:
   Ignore the setup.exe file (Windows, not supported here) and the Source code files.
 - Mac: open the .dmg, drag LogosBasecamp onto Applications, open it from Applications.
   Linux: allow the .AppImage file to run as a program, then double-click it.
-- Preferred way to add the app: in Basecamp click "Applications" in the menu on the right, then
+- Easiest way for an assistant: download the Manifesto app file (one signed file for every
+  supported computer) and install it by hand:
+  https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx
+  If you can download files on my computer, put it in my Downloads folder. Then in Basecamp: click
+  "Applications" in the menu on the right, then "Install Local Package", choose manifesto_ui.lgx and
+  confirm the install. Basecamp may say it does not know the publisher "thehat" yet; that is
+  expected. The app needs no other packages.
+- Other way, which also brings updates later: in Basecamp click "Applications", then
   "Manage Repositories", paste this address into "Add a repository" and click "Add":
   https://raw.githubusercontent.com/roxanneen/basecamp-apps/main/logos-repo.json
   Then go back to "Applications", scroll down to "Basecamp apps by thehat" and click "Manifesto".
-  It is signed by the publisher "thehat".
-  If Basecamp shows a fingerprint and a "Trust & install" button, the fingerprint must be exactly
-  6AB9 AD2D 6E8D FA6D. If it matches, click "Trust & install"; if not, stop.
-- Fallback: download this one file (it is the same for every supported computer, and signed by
-  "thehat"): https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui.lgx
-  Then in Basecamp: Package Manager, Install Local Package, choose the file, confirm the
-  "Install Package?" box. Basecamp may say it does not know the publisher yet; that is expected
-  for a file added by hand. The app needs no other packages.
 - Then open the Manifesto app and click "Sign the manifesto". A green box confirms it.
 - The Manifesto app and Basecamp never need an account, a wallet, a payment or a password. The one
   exception is my own computer asking for my computer password to allow a newly downloaded app to
