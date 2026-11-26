@@ -1,8 +1,14 @@
-# Manifesto for Logos Basecamp
+# Manifesto app
 
-`manifesto_ui` lets a person read the Logos manifesto in Basecamp and sign it in one click. The app
-makes a signing key for itself on first run, so no account is needed. The result is a small receipt
-that anyone can check without a server. It is a `ui_qml` module built with the Logos module builder.
+> **Disclaimer.** This is a personal, experimental hobby project. It is not an
+> official Logos product. Not audited. It is provided as is, with no warranty of
+> any kind and no affiliation with or endorsement by any of the projects it
+> interoperates with, or by the author of the manifesto. See [Licence](#licence).
+
+An unofficial app for the Basecamp desktop shell. It lets a person read the Logos manifesto and sign
+it in one click. The app makes a signing key for itself on first run, so no account is needed. The
+result is a small receipt that anyone can check without a server. It is a `ui_qml` module built with
+the Logos module builder.
 
 **New here? Follow the [step-by-step guide](docs/INSTALL.md).** It covers installing Basecamp,
 adding this app and signing, in plain language. It works on macOS (Apple chip) and Linux desktops
@@ -37,7 +43,7 @@ The full walkthrough, including installing Basecamp itself, is in
 1. Install [Logos Basecamp](https://github.com/logos-co/logos-basecamp/releases/latest) 0.3.2 or
    newer.
 2. Download the `.lgx` for your computer from the
-   [latest release](https://github.com/roxanneen/Basecamp-manifesto-app/releases/latest):
+   [latest release](https://github.com/roxanneen/Manifesto-app/releases/latest):
 
    | Asset | Platform |
    |---|---|

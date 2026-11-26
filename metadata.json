@@ -5,7 +5,7 @@
   "type": "ui_qml",
   "interface": "universal",
   "category": "social",
-  "description": "Read the Logos manifesto and sign it in one click, with a key the app makes for you. Anyone can check the signature without a server.",
+  "description": "Unofficial app, not a Logos product. Read the Logos manifesto and sign it in one click, with a key the app makes for you. Anyone can check the signature without a server.",
   "main": "manifesto_ui_plugin",
   "icon": "icons/manifesto.png",
   "view": "qml/Main.qml",

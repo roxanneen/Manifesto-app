@@ -222,7 +222,7 @@ Item {
                     wrapMode: Text.WordWrap
                     color: Theme.palette.textTertiary
                     font.pixelSize: Theme.typography.secondaryText
-                    text: "Text by Jarrad Hope. Source: logos.co/manifesto"
+                    text: "Text by Jarrad Hope. Source: logos.co/manifesto. This app is an unofficial hobby project. It is not a Logos product and is not endorsed by Logos or by the author."
                 }
 
                 LogosFrame {

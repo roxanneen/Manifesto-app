@@ -1,5 +1,5 @@
 {
-  description = "Manifesto: read and sign the Logos manifesto in Basecamp, with a signature anyone can check";
+  description = "Manifesto app (unofficial): read and sign the Logos manifesto in Basecamp, with a signature anyone can check";
 
   inputs = {
     logos-module-builder.url = "github:logos-co/logos-module-builder";

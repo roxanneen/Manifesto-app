@@ -3,6 +3,10 @@
 This guide takes you from nothing installed to a signed manifesto. It takes about ten minutes. You
 do not need an account, a wallet, a password or any technical knowledge.
 
+> **Please note.** The Manifesto app is a personal, experimental hobby project. It is not an official
+> Logos product and it has not been audited. It is provided as is, with no warranty of any kind. It
+> is not affiliated with or endorsed by Logos, by Basecamp, or by the author of the manifesto.
+
 You will do three things:
 
 1. Install Logos Basecamp, the desktop app that runs Logos apps.
@@ -69,7 +73,7 @@ You need Basecamp version 0.3.2 or newer. The link above always gives you the ne
 
 ## Step 2: Download the Manifesto app
 
-1. Open this page: <https://github.com/roxanneen/Basecamp-manifesto-app/releases/latest>
+1. Open this page: <https://github.com/roxanneen/Manifesto-app/releases/latest>
 2. Scroll down to **Assets** and click the file for your computer. Pick the name that ends in
    `.lgx`. Ignore the files ending in `.sha256` and the two called **Source code**.
 
@@ -146,7 +150,7 @@ difficult, skip it. A new computer makes a new key and you can sign again.
 | Manifesto does not appear after installing | Quit Basecamp and open it again (see the end of Step 3) |
 | The app says **Signing is off** | Quit Basecamp and open it again (see the end of Step 3). If the message stays, report it using the link below and copy the message into your report |
 
-Report a problem here: <https://github.com/roxanneen/Basecamp-manifesto-app/issues>. Reporting needs
+Report a problem here: <https://github.com/roxanneen/Manifesto-app/issues>. Reporting needs
 a free GitHub account. Installing and signing do not.
 
 ## Using an AI assistant to help you
@@ -159,9 +163,10 @@ Please help me install an app, one small step at a time. Wait for me to confirm 
 giving the next one. I am not technical.
 
 Goal: sign the Logos manifesto using the Manifesto app in Logos Basecamp.
+The Manifesto app is an unofficial hobby project. It is not made or endorsed by Logos.
 
 Follow this guide. If you cannot open the link, use the facts below and do not invent other steps.
-https://github.com/roxanneen/Basecamp-manifesto-app/blob/main/docs/INSTALL.md
+https://github.com/roxanneen/Manifesto-app/blob/main/docs/INSTALL.md
 
 Facts you need:
 - It only works on macOS with an Apple chip (M1 or newer) and on 64-bit Linux desktops
@@ -172,7 +177,7 @@ Facts you need:
   Ignore the setup.exe file (Windows, not supported here) and the Source code files.
 - Mac: open the .dmg, drag LogosBasecamp onto Applications, open it from Applications.
   Linux: allow the .AppImage file to run as a program, then double-click it.
-- Manifesto app download: https://github.com/roxanneen/Basecamp-manifesto-app/releases/latest
+- Manifesto app download: https://github.com/roxanneen/Manifesto-app/releases/latest
   Files: manifesto_ui-darwin-arm64.lgx, manifesto_ui-linux-x86_64.lgx, manifesto_ui-linux-aarch64.lgx
   Ignore the .sha256 files and the Source code files.
 - In Basecamp: Package Manager, then Install Local Package, then choose the .lgx file, then
@@ -190,11 +195,11 @@ The Manifesto download can be done in a terminal. Replace `<platform>` with `dar
 `linux-x86_64` or `linux-aarch64`.
 
 ```bash
-curl -L -o manifesto_ui.lgx https://github.com/roxanneen/Basecamp-manifesto-app/releases/latest/download/manifesto_ui-<platform>.lgx
+curl -L -o manifesto_ui.lgx https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui-<platform>.lgx
 ```
 
 ```bash
-curl -L -o manifesto_ui.lgx.sha256 https://github.com/roxanneen/Basecamp-manifesto-app/releases/latest/download/manifesto_ui-<platform>.lgx.sha256
+curl -L -o manifesto_ui.lgx.sha256 https://github.com/roxanneen/Manifesto-app/releases/latest/download/manifesto_ui-<platform>.lgx.sha256
 ```
 
 The `.sha256` file holds the expected checksum of the package. Compare it with the output of

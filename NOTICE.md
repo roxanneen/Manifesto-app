@@ -1,5 +1,13 @@
 # Notice
 
+## Not an official Logos product
+
+The Manifesto app is a personal, experimental hobby project. It is not an official Logos product. It
+has not been audited. It is provided as is, with no warranty of any kind, and with no affiliation
+with or endorsement by any of the projects it interoperates with, or by the author of the manifesto.
+Including the manifesto text here does not mean its author or Logos has reviewed or approved this
+app.
+
 ## The manifesto text
 
 `src/manifesto.txt` is "Logos: A Declaration of Independence in Cyberspace" by Jarrad Hope.
