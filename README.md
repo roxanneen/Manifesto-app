@@ -47,7 +47,7 @@ The full walkthrough, including installing Basecamp itself, is in
    ```
 
 3. Install **Manifesto** from the Package Manager list. The package is signed by the publisher
-   **thehat**; the catalogue is [roxanneen/basecamp-apps](https://github.com/roxanneen/basecamp-apps).
+   **thehat**; the catalogue has a page at <https://roxanneen.github.io/basecamp-apps/>.
 4. Open **Manifesto** and click **Sign the manifesto**.
 
 Without the catalogue: download

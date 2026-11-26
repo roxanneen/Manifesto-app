@@ -96,7 +96,8 @@ person as the Manifesto app, under the name **thehat**, and its packages are sig
 5. **Manifesto** now appears among your apps in Basecamp. Click it to open it.
 
 The same catalogue also lists three other apps by the same publisher (OneSecret, Chess and a
-Presence pilot). You do not need them to sign the manifesto.
+Presence pilot). You do not need them to sign the manifesto. The catalogue has its own page, with
+the address and a copy button: <https://roxanneen.github.io/basecamp-apps/>
 
 ### Way 2: download the file yourself
 
