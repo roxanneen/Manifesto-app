@@ -20,7 +20,7 @@ This works on **desktop and laptop computers running macOS or Linux**.
 | Your computer | Does it work? |
 |---|---|
 | Mac with an Apple chip (M1, M2, M3, M4 or newer) | Yes |
-| Linux desktop or laptop (Intel, AMD or ARM, 64-bit) | Yes. Tested automatically, not yet by hand in Basecamp. If something fails, please report it (link near the end) |
+| Linux desktop or laptop (Intel, AMD or ARM, 64-bit) | Yes |
 | Windows | No, not yet. Basecamp's download page has a Windows file (`setup.exe`), but the Manifesto app has no Windows version, so do not continue on Windows |
 | Mac with an Intel processor | No |
 | Phone or tablet (iPhone, iPad, Android) | No |

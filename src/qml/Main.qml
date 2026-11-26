@@ -309,6 +309,8 @@ Item {
                             }
                             LogosButton {
                                 objectName: "signButton"
+                                // The screen's one main action.
+                                variant: LogosButton.Variant.Primary
                                 text: root.busy ? "Waiting for the Signer…"
                                       : (root.chosen && root.chosen.signed ? "Sign again" : "Sign the manifesto")
                                 enabled: root.ready && !root.busy && root.chosen !== null && root.chosen.available !== false

@@ -17,17 +17,17 @@ only: not on Windows, Intel Macs, phones or tablets.
 The manifesto is "Logos: A Declaration of Independence in Cyberspace" by Jarrad Hope. Source:
 <https://logos.co/manifesto>. See [NOTICE.md](NOTICE.md).
 
-![The app after signing](docs/screenshot.png)
+![The Manifesto app](docs/screenshot.png)
 
 ## Status
 
-Version 0.1.0, 26 November 2026. This version signs and verifies on one computer and exports the
+Version 0.1.1, 26 November 2026. This version signs and verifies on one computer and exports the
 receipt. There is no shared list of signers yet.
 
 | Platform | State |
 |---|---|
 | macOS, Apple Silicon | Built, tested headless, and used in Basecamp |
-| Linux x86_64 and ARM64 | Built and tested by CI (see the Actions tab for the latest run); not tried in Basecamp by hand |
+| Linux x86_64 and ARM64 | Built and tested by CI (see the Actions tab for the latest run). An outside tester built it from source on Linux, ran it in Basecamp, signed, and verified the receipt with a separate Ethereum library |
 | Intel Macs, phones, tablets | Not supported. Basecamp itself has no build for them |
 | Windows | Not supported. The Windows code paths have never been compiled |
 
